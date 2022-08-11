@@ -1,3 +1,3 @@
 # E-Commerce
 ## ERD
-![ALT](Capstone\erd\erd.jpg "ERD")
+![ALT](\erd\erd.jpg "ERD")
