@@ -45,6 +45,13 @@ header{
         right: 3%;
         top: 17px;
     }
+    header .div_end{
+        text-align-last: auto;
+        position: absolute;
+        right: 1%;
+        top: 17px;
+        width:245px;
+    }
 main{
     padding: 2% 3% 4% 3%;
     text-align: center;

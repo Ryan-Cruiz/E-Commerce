@@ -4,23 +4,13 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>(Product Page) Tshirt | Lashopda</title>
+    <title>(Product Page) Tshirt | iStore</title>
     <script src="../../../application/views/assets/js/jquery.min.js"></script>
     <link rel="stylesheet" type="text/css" href="../../../application/views/assets/css/normalize.css" />
     <link rel="stylesheet" type="text/css" href="../../../application/views/assets/css/style.css" />
+    <script src="../../../application/views/assets/js/pagination.js"></script>
     <script>
-        
-        /*  For pagination highlight    */
-        function pageNumHighlight(pageNum){
-            $(".pagination > a").css("background-color", "white").css("color", "blue");
-            for(var i = 0; i < document.querySelectorAll(".pagination > a").length; i++){
-                if(pageNum == $(".pagination > a:nth-child(" + i + ")").text()){
-                    $(".pagination > a:nth-child(" + i + ")").css("background-color", "#1975ff").css("color", "white");
-                }
-            }
-        }
         /**********************************************/
-
         $(document).ready(function(){
             /*  For submission of forms & updating of cart quantity    */
             var cart_quantity = 4;
@@ -73,8 +63,11 @@
 </head>
 <body>
     <header>
-        <a href="products_page.html"><h2>Lashopda</h2></a>
-        <a class="nav_end" href="cart_page.html"><h3>Shopping Cart (<span class="cart_quantity">4</span>)</h3></a>
+        <a href="products_page.html"><h2>iStore</h2></a>
+        <div class="div_end">
+            <a href="cart_page.html"><h3>Shopping Cart (<span class="cart_quantity">4</span>)</h3></a>
+            <a href="../login_register/login_page.html"><h3>Log off</h3></a>
+        </div>
     </header>
     <main>
         <section class="item_panel">
