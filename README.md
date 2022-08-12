@@ -1,3 +1,4 @@
 # E-Commerce
 ## ERD
-![erd](https://user-images.githubusercontent.com/109123846/184170126-3b737e7a-4038-422a-9e4b-0c8932a837cb.JPG)
+![erd](https://user-images.githubusercontent.com/109123846/184322260-714d273c-8d5d-4c8f-a163-b440b3e39ade.JPG)
+
