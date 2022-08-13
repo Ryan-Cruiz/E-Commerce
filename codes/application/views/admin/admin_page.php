@@ -9,6 +9,7 @@
         <title><?=$title?></title>
         <script src="/assets/js/jquery.min.js"></script>
         <script src="/assets/js/jquery-ui.js"></script>
+        <script src="/assets/js/all_function.js"></script>
         <script src="/assets/js/pagination.js"></script>
         <script src='/assets/js/login_page.js'></script>
     </head>

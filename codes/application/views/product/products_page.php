@@ -9,7 +9,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products | isStore</title>
     <script src="/assets/js/jquery.min.js"></script>
+    <script src="/assets/js/all_function.js"></script>
+    <script src="/assets/js/paginate.js"></script>
     <script src='/assets/js/pagination.js'></script>
+
 </head>
 <body>
 <?php $this->load->view('partials/header')?>
