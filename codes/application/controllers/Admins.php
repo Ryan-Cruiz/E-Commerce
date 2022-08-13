@@ -5,6 +5,7 @@ class Admins extends CI_Controller{
     public function __construct(){
         parent::__construct();
         $this->load->model('User');
+        $this->load->model('Admin');
     }
     public function index(){
       $this->order_page();
@@ -25,9 +26,19 @@ class Admins extends CI_Controller{
         $this->page_redirection(array('title'=>'Order Dashboard'),'order_dashboard');
     }
     public function product_dashboard(){
-        $this->page_redirection(array('title'=>'Product Dashboard'),'product_dashboard');
+        $data = $this->Admin->get_all_products();
+       
+        $this->page_redirection(array('title'=>'Product Dashboard','data' => $data),'product_dashboard');
     }
     public function order_detail(){
         $this->page_redirection(array('title'=>'Order Details'),'order_details');
+    }
+    public function get_edit($id){
+        $edit['data'] = $this->Admin->get_product_id($id);
+        echo json_encode($edit);
+    }
+    public function get_category(){
+        $category['data'] = $this->Admin->get_all_category();
+        echo json_encode($category);
     }
 }

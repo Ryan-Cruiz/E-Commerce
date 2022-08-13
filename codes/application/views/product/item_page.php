@@ -9,9 +9,8 @@
     <title>(Product Page) Tshirt | Lashopda</title>
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/all_function.js"></script>
-    <script src="/assets/js/paginate.js"></script>
+    <script src="/assets/js/pagination.js"></script>
     <script>
-
         $(document).ready(function(){
             /*  For submission of forms & updating of cart quantity    */
             var cart_quantity = 4;

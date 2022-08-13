@@ -10,7 +10,6 @@
     <title>Products | isStore</title>
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/all_function.js"></script>
-    <script src="/assets/js/paginate.js"></script>
     <script src='/assets/js/pagination.js'></script>
 
 </head>
