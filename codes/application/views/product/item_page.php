@@ -8,20 +8,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>(Product Page) Tshirt | Lashopda</title>
     <script src="/assets/js/jquery.min.js"></script>
-   
+    <script src="/assets/js/all_function.js"></script>
+    <script src="/assets/js/pagination.js"></script>
     <script>
-        
-        /*  For pagination highlight    */
-        function pageNumHighlight(pageNum){
-            $(".pagination > a").css("background-color", "white").css("color", "blue");
-            for(var i = 0; i < document.querySelectorAll(".pagination > a").length; i++){
-                if(pageNum == $(".pagination > a:nth-child(" + i + ")").text()){
-                    $(".pagination > a:nth-child(" + i + ")").css("background-color", "#1975ff").css("color", "white");
-                }
-            }
-        }
-        /**********************************************/
-
         $(document).ready(function(){
             /*  For submission of forms & updating of cart quantity    */
             var cart_quantity = 4;
@@ -34,29 +23,6 @@
                 cart_quantity += parseInt($(".new_order_qty").val().split(" ")[0]);
                 $(".cart_quantity").text(cart_quantity);
                 
-                return false;
-            });
-            /**********************************************/
-
-            /*  Pagination at footer    */
-            var pageNum = 1;
-            pageNumHighlight(pageNum);
-
-            $(document).on("click", ".pagination > a:not(.next_page)", function(){
-                pageNum = $(this).text();
-                pageNumHighlight(pageNum);
-                return false;
-            });
-            $(document).on("click", ".next_page", function(){
-                pageNum++;
-                pageNumHighlight(pageNum);
-                return false;
-            });
-            /**********************************************/
-
-            /*  For going back from previous page    */
-            $(document).on("click", ".go_back", function(){
-                history.back();
                 return false;
             });
             /**********************************************/
