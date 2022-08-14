@@ -113,13 +113,10 @@
                 <div class="category_confirm_delete">
                     <p>Are you sure you want to delete "<span class="category_name">Shirt</span>" category?</p>
                     <div>
-<<<<<<< HEAD
                         <form action="" method="post">  <!-- Delete category form-->
                             <input class="category_id" type="hidden" name="category_id" value="id"/>
                             <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
-=======
                         <form action="/Admins/delete_category/<?=$c['id']?>" method="post">  <!-- Delete category form-->
->>>>>>> develop
                             <input type="submit" value="Yes" />
                         </form>
                         <button type="button">No</button>

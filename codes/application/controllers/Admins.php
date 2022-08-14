@@ -48,7 +48,6 @@ class Admins extends CI_Controller{
         echo json_encode($category);
     }
     /* EDIT CATEGORY */
-
     public function edit_category($id){
         $this->output->enable_profiler(true);
         $this->Admin->update_category($id,$this->input->post('category'));
@@ -56,6 +55,5 @@ class Admins extends CI_Controller{
     /* DELETE CATEGORY */
     public function delete_category($id){
         $this->Admin->delete_category($id);
-
     }
 }
