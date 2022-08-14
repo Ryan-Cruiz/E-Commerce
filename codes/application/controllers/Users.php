@@ -77,13 +77,15 @@ class Users extends CI_Controller{
 		$result = $this->User->create_validator($email,$contact);
 		if($result =='success'){
 			$data = $this->User->insert_user($this->input->post());
-			if($data === 1){
-				$this->User->setAdmin($data);
-				$this->User->setUser($data,$this->input->post());
-				redirect('admin');
-			}else{
+			if($data != 1){
 				$this->User->setUser($data,$this->input->post());
 				redirect('dashboard');
+			}else{
+				$this->session->set_userdata('is_admin',TRUE);
+				$this->User->setUser($data,$this->input->post());
+				$this->User->setAdmin($data);
+				redirect('admin');
+				
 			}
 		}else if($result == 'email'){
 			$this->session->set_flashdata('errors', "<p>Email is already taken</p>");

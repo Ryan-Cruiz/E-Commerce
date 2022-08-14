@@ -57,10 +57,15 @@
                 --><a class="next_page" href="">&rsaquo;</a>
                 </section>
         </main>
+
         <div class="admin_product_delete">
             <p>Are you sure you want to delete product "<span class="delete_product_name">Product Name</span>" (ID: <span class="delete_product_id">ID</span>)</p>
             <div>
+<<<<<<< HEAD
                 <form action="" method="post"> <!-- Delete product Form-->
+=======
+                <form action="/admins/delete_product" method="post"> <!-- Delete Form-->
+>>>>>>> develop
                     <input class="product_id" type="hidden" name="product_id" value="id"/>
                     <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                     <input type="submit" value="Yes" />
@@ -68,6 +73,7 @@
                 <button type="button">No</button>
             </div>
         </div>
+
         <div class="modal_bg_delete_product"></div>
         <div class="modal_bg"></div>
         <dialog class="admin_products_add_edit">
@@ -78,7 +84,7 @@
                     <path fill-rule="evenodd" d="M2.146 2.146a.5.5 0 0 0 0 .708l11 11a.5.5 0 0 0 .708-.708l-11-11a.5.5 0 0 0-.708 0Z"/>
                 </svg>
             </button>
-            <form class="form_product_add_edit" action="" method="post">  <!-- Edit Form-->
+            <form class="form_product_add_edit" action="/admins/add_product/" method="post">  <!-- Edit Form-->
                 <p>Name: </p><input class="input_product_name" type="text" name="product_name"/>
                 <p>Description: </p><textarea class="input_product_desc" name="product_desc"></textarea>
                 <p>Categories: </p>
@@ -102,19 +108,25 @@
                     <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                 </div>
             </form>
+<?php foreach($category as $c){?>
             <div class="bg_category_confirm_delete">
                 <div class="category_confirm_delete">
                     <p>Are you sure you want to delete "<span class="category_name">Shirt</span>" category?</p>
                     <div>
+<<<<<<< HEAD
                         <form action="" method="post">  <!-- Delete category form-->
                             <input class="category_id" type="hidden" name="category_id" value="id"/>
                             <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
+=======
+                        <form action="/Admins/delete_category/<?=$c['id']?>" method="post">  <!-- Delete category form-->
+>>>>>>> develop
                             <input type="submit" value="Yes" />
                         </form>
                         <button type="button">No</button>
                     </div>
                 </div>
             </div>
+<?php }?>
         </dialog>
         <script src="/assets/js/product_dashboard.js"></script>
     </body>

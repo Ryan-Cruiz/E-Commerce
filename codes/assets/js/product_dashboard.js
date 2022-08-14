@@ -332,9 +332,14 @@
                 });
 
                 // submit delete form using the general ajax. Not this!
-                $(document).on("click", ".category_confirm_delete input[type=submit]", function(){
+                $(document).on("click", ".category_confirm_delete", function(){
                     $("." + $(this).siblings().val()).remove();
-                    $(this).parent().submit(function(){ return false; });
+                    $(this).parent().submit(function(){ 
+                        $.post($(this).attr('action'), $(this).serialize(), function() {
+                            // I don't get it but it needs to perform this action to send it to the database!
+                        });
+                        return false;
+                    });
                     resetCategoryDisplay();
                 });
                 /**********************************************/
@@ -367,6 +372,8 @@
                 var onLoadCounter = 0;
                 reader.addEventListener('load', function(e){
                 // reader.onload = function (e) {
+                   // console.log(e);
+                 
                     var htmlStr = "" +
                         '<li class="img_upload_section">' +
                             '<figure>' +
@@ -378,18 +385,19 @@
                                 '<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>' +
                             '</svg>' +
                             // '<input type="checkbox" name="is_img_upload_main_id" value="filename" />' +
-                            '<input type="checkbox" name="img_upload_main_id" value="filename" />' +
+                            '<input type="checkbox" name="img_upload_main_id" value="0" />' +
                             '<label>main</label>' +
                         '</li>';
-                    
+                       
                     onLoadCounter++;
                     $(".img_upload_container").append(htmlStr);
                 // }
                 });
                 reader.readAsDataURL(input.files[0]);
-
+              
                 var counter = 1;
                 reader.onloadend = function(e){
+                    console.log('Uploaded files same time counter: '+counter); // ACTIVATE THIS BAD BOI AND PICK 4 PICTURE SAME TIME!(NOT MY CODE THO -ryan)
                     if(counter < input.files.length){
                         reader.readAsDataURL(input.files[counter]); 
                         counter++;
@@ -404,10 +412,13 @@
             /********************************************************************/
             
 
-            /*  Disable other checkbox when a checkbox is checked    */
+            /*  Disable other checkbox when a checkbox is checked  
+            edit: and also if checkbox is check set it to 1(main) 0(not)  */
             $(document).on("click", ".img_upload_section input[type=checkbox]", function(){
+                $(this).val('1');
                 if($(".img_upload_section input[type=checkbox]").not(this).attr("disabled")){
                     resetCheckbox();
+                    $(this).val('0');
                 }
                 else{
                     $(".img_upload_section input[type=checkbox]").not(this).attr("disabled", true);

@@ -27,27 +27,35 @@ class Admins extends CI_Controller{
     }
     public function product_dashboard(){
         $data = $this->Admin->get_all_products();
-       
-        $this->page_redirection(array('title'=>'Product Dashboard','data' => $data),'product_dashboard');
+        $category = $this->Admin->get_all_category();
+        $this->page_redirection(array('title'=>'Product Dashboard','data' => $data,'category'=> $category),'product_dashboard');
     }
     public function order_detail(){
         $this->page_redirection(array('title'=>'Order Details'),'order_details');
     }
+    /* EDIT VIEW PAGE FORM */
     public function get_edit($id){
         $edit['data'] = $this->Admin->get_product_id($id);
         echo json_encode($edit);
     }
+
+    /* CATEGORIES */
+    /* GET CATEGORIES */
     public function get_category(){
         $category['data'] = $this->Admin->get_all_category();
         $category['csrf'] = array('name'=>$this->security->get_csrf_token_name(),
         "hash"=>$this->security->get_csrf_hash());
         echo json_encode($category);
     }
+    /* EDIT CATEGORY */
+
     public function edit_category($id){
         $this->output->enable_profiler(true);
         $this->Admin->update_category($id,$this->input->post('category'));
     }
+    /* DELETE CATEGORY */
     public function delete_category($id){
+        $this->Admin->delete_category($id);
 
     }
 }
