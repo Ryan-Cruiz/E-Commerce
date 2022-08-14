@@ -54,25 +54,12 @@ class Admin extends CI_Model{
         
     }
     /* UPDATE CATEGORY */
-<<<<<<< HEAD
-
-=======
->>>>>>> develop
     public function update_category($id,$input){
         return $this->db->query('UPDATE categories SET category = ?, updated_at = NOW() WHERE id = ?',
         array($this->security->xss_clean($input),$this->security->xss_clean($id)));
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> develop
     /* DELETE CATEGORY QUERY */
     public function delete_category($id){
         return $this->db->query('DELETE FROM categories WHERE id = ?',array($this->security->xss_clean($id)));
     }
-<<<<<<< HEAD
-
-=======
- 
->>>>>>> develop
 }
