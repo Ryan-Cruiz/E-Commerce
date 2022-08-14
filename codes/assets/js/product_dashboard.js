@@ -222,11 +222,12 @@
                     categoriesOption += 
                         '<li class="product_category_edit_delete_section arr_' + i + '">' +
 
-                            '\n\t<form class="form_product_category_edit" action="" method="post">' +
+                            '\n\t<form class="form_product_category_edit" action="/Admins/edit_category/'+res.data[i].id+'" method="post">' +
                                 '\n\t\t<input class="product_category_id" type="hidden" name="product_category_id" value="arr_' + i + '"/>' +
-                                '\n\t\t<input class="product_category_text_input" readonly type="text" value="' + res.data[i].category + '"/>' +
+                                '\n\t\t<input class="product_category_text_input" name="category" readonly type="text" value="' + res.data[i].category + '"/>' +
+                                // '<input type="submit" value="✔" />'+
+                                '<input type="hidden" name="'+res.csrf.name+'" value="'+res.csrf.hash+'"/>'+
                             '\n\t</form>' +
-
                             '\n\t<div class="product_category_btn">' +
 
                                 '\n\t\t<div class="waiting_icon"><img src="/assets/img/ajax-loading-icon.gif" alt="waiting icon"></div>' +
@@ -292,17 +293,25 @@
                 });
 
                 // This should be on ajax
-                $(document).on("mouseleave keypress", ".product_category_text_input", function(){
+                $(document).on("change", ".product_category_text_input", function(){
                     if($(this).attr("readonly") != "readonly"){
                         // display waiting icon before sending
                         $(this).parent().siblings(".product_category_btn").children(".waiting_icon").css("visibility", "visible");
                         // activate ajax and send form.
-                        $(this).parent().submit(function(){ return false; });
+                        $(this).parent().submit(function(){
+                            $.post($(this).attr('action'), $(this).serialize(), function(res) {
+                                // I don't get it but it needs to perform this action to send it to the database!
+                            });
+                            return false;
+                        });
                         // hide waiting icon after receiving ang changing all data.
                         setTimeout(function(){
                             $(".waiting_icon").css("visibility", "hidden");
                         }, 500);
+
                     }
+                    
+                   
                 });
                 /**********************************************/
                 

@@ -39,6 +39,15 @@ class Admins extends CI_Controller{
     }
     public function get_category(){
         $category['data'] = $this->Admin->get_all_category();
+        $category['csrf'] = array('name'=>$this->security->get_csrf_token_name(),
+        "hash"=>$this->security->get_csrf_hash());
         echo json_encode($category);
+    }
+    public function edit_category($id){
+        $this->output->enable_profiler(true);
+        $this->Admin->update_category($id,$this->input->post('category'));
+    }
+    public function delete_category($id){
+
     }
 }

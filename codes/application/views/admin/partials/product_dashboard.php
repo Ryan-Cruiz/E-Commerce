@@ -60,8 +60,9 @@
         <div class="admin_product_delete">
             <p>Are you sure you want to delete product "<span class="delete_product_name">Product Name</span>" (ID: <span class="delete_product_id">ID</span>)</p>
             <div>
-                <form action="" method="post"> <!-- Delete Form-->
+                <form action="" method="post"> <!-- Delete product Form-->
                     <input class="product_id" type="hidden" name="product_id" value="id"/>
+                    <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                     <input type="submit" value="Yes" />
                 </form>
                 <button type="button">No</button>
@@ -98,6 +99,7 @@
                     <button class="btn_preview_products_add_edit" type="button">Preview</button>
                     <input class="product_id" type="hidden" name="product_id" value=""/>
                     <input class="btn_submit_products_add_edit" type="submit" value="Update" />
+                    <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                 </div>
             </form>
             <div class="bg_category_confirm_delete">
@@ -106,6 +108,7 @@
                     <div>
                         <form action="" method="post">  <!-- Delete category form-->
                             <input class="category_id" type="hidden" name="category_id" value="id"/>
+                            <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                             <input type="submit" value="Yes" />
                         </form>
                         <button type="button">No</button>

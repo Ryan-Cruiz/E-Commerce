@@ -22,4 +22,11 @@ class Admin extends CI_Model{
     public function update_product(){
         
     }
+    public function update_category($id,$input){
+        return $this->db->query('UPDATE categories SET category = ?, updated_at = NOW() WHERE id = ?',
+        array($this->security->xss_clean($input),$this->security->xss_clean($id)));
+    }
+    public function delete_category($id){
+        return $this->db->query('DELETE FROM categories WHERE id = ?',array($this->security->xss_clean($id)));
+    }
 }
