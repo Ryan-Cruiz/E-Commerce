@@ -29,11 +29,14 @@ class Admins extends CI_Controller{
         $data = $this->Admin->get_all_products();
         $category = $this->Admin->get_all_category();
         $this->page_redirection(array('title'=>'Product Dashboard','data' => $data,'category'=> $category),'product_dashboard');
+  
+        $this->page_redirection(array('title'=>'Product Dashboard','data' => $data),'product_dashboard');
     }
     public function order_detail(){
         $this->page_redirection(array('title'=>'Order Details'),'order_details');
     }
     /* EDIT VIEW PAGE FORM */
+
     public function get_edit($id){
         $edit['data'] = $this->Admin->get_product_id($id);
         echo json_encode($edit);
@@ -55,5 +58,10 @@ class Admins extends CI_Controller{
     /* DELETE CATEGORY */
     public function delete_category($id){
         $this->Admin->delete_category($id);
+    }
+
+    public function get_category(){
+        $category['data'] = $this->Admin->get_all_category();
+        echo json_encode($category);
     }
 }

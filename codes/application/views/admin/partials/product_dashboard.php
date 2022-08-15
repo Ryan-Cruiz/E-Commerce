@@ -57,19 +57,22 @@
                 --><a class="next_page" href="">&rsaquo;</a>
                 </section>
         </main>
-
         <div class="admin_product_delete">
             <p>Are you sure you want to delete product "<span class="delete_product_name">Product Name</span>" (ID: <span class="delete_product_id">ID</span>)</p>
             <div>
                 <form action="/admins/delete_product" method="post"> <!-- Delete Form-->
                     <input class="product_id" type="hidden" name="product_id" value="id"/>
                     <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
+        <div class="admin_product_delete">
+            <p>Are you sure you want to delete product "<span class="delete_product_name">Product Name</span>" (ID: <span class="delete_product_id">ID</span>)</p>
+            <div>
+                <form action="" method="post"> <!-- Delete Form-->
+                    <input class="product_id" type="hidden" name="product_id" value="id"/>
                     <input type="submit" value="Yes" />
                 </form>
                 <button type="button">No</button>
             </div>
         </div>
-
         <div class="modal_bg_delete_product"></div>
         <div class="modal_bg"></div>
         <dialog class="admin_products_add_edit">
@@ -105,12 +108,15 @@
                 </div>
             </form>
 <?php foreach($category as $c){?>
+                </div>
+            </form>
             <div class="bg_category_confirm_delete">
-                <div class="category_confirm_delete">
                     <p>Are you sure you want to delete "<span class="category_name">Shirt</span>" category?</p>
                     <div>
                             <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                         <form action="/Admins/delete_category/<?=$c['id']?>" method="post">  <!-- Delete category form-->
+                        <form action="" method="post">  <!-- Delete category form-->
+                            <input class="category_id" type="hidden" name="category_id" value="id"/>
                             <input type="submit" value="Yes" />
                         </form>
                         <button type="button">No</button>

@@ -8,6 +8,10 @@ class Admin extends CI_Model{
     INNER JOIN specific_categories ON specific_categories.product_id = products.id
     INNER JOIN categories ON categories.id = specific_categories.category_id
     INNER JOIN product_images ON product_images.product_id = products.id";
+    private $query = "SELECT item_name,description,products.id,category,url,stock,price,total_sold 
+    FROM products 
+    INNER JOIN categories ON categories.id = products.category_id
+    INNER JOIN product_images ON product_id = products.id";
     /* GET ALL PRODUCTS AND THE MAIN IMAGE */
     public function get_all_products(){
         return $this->db->query($this->query." WHERE is_main = 1")->result_array();
@@ -61,5 +65,8 @@ class Admin extends CI_Model{
     /* DELETE CATEGORY QUERY */
     public function delete_category($id){
         return $this->db->query('DELETE FROM categories WHERE id = ?',array($this->security->xss_clean($id)));
+    }
+    public function update_product(){
+        
     }
 }

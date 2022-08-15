@@ -221,7 +221,6 @@
                 for(var i = 0; i < res.data.length; i++){
                     categoriesOption += 
                         '<li class="product_category_edit_delete_section arr_' + i + '">' +
-
                             '\n\t<form class="form_product_category_edit" action="/Admins/edit_category/'+res.data[i].id+'" method="post">' +
                                 '\n\t\t<input class="product_category_id" type="hidden" name="product_category_id" value="arr_' + i + '"/>' +
                                 '\n\t\t<input class="product_category_text_input" name="category" readonly type="text" value="' + res.data[i].category + '"/>' +
@@ -324,6 +323,80 @@
                     $(".category_name").text(categoryName);
                     $(".category_id").val(categoryID);
 
+                            '\n\t</div>' +
+
+                        '\n</li>';
+
+                    selectOptions += '<option value="' + res.data[i].category + '">' + res.data[i].category + '</option>';
+                }
+                $(".product_categories").html(categoriesOption);
+                resetCategoryDisplay();
+            
+                /**********************************************/
+
+                /*  Show the options/categories for the dummy select tag    */
+                $(document).on("click", ".dummy_select_tag", function(){
+                    $(this).css("border", "2px solid black");
+                    $(".product_categories").toggle();
+                });
+    
+                /**********************************************/
+
+                /*  Show the edit/delete buttons on hover.    */
+                $(document)
+                    .on("mouseenter", ".product_category_edit_delete_section",  function(){
+                        $(this).children(".product_category_btn").css("visibility", "visible");
+                        $(this).children("form").children().css("cursor", "default").css("background-color", "#00aff8");
+                        $(this).css("cursor", "default").css("background-color", "#00aff8");
+                        if($(this).children("form").children("input[type=text]").attr("readonly") == null){
+                            $(this).children("form").children("input[type=text]").css("cursor", "text");
+                        }
+                    })
+                    .on("mouseleave", ".product_category_edit_delete_section",  function(){
+                        $(this).children(".product_category_btn").css("visibility", "hidden");
+                        $(this).children("form").children().css("background-color", "white");
+                        $(this).css("background-color", "white");
+                    });
+                /**********************************************/
+
+                /*  Assign the value of selected option to the dummy select tag    */
+                $(document).on("click", ".form_product_category_edit", function(){
+                    if($(this).children(".product_category_text_input").attr("readonly") != null){
+                        $(".dummy_select_tag span:first-child").text($(this).children(".product_category_text_input").val());
+                        resetCategoryDisplay();
+                    }
+                });
+                /**********************************************/
+
+                /*  Edit the value of the specific category    */
+                $(document).on("click", ".btn_product_category_edit", function(){
+                    $(".product_category_text_input").attr("readonly", true).css("outline", "none");
+                    $(this).parent().siblings("form").children(".product_category_text_input").attr("readonly", false).css("outline", "2.5px solid black").css("cursor", "text");
+                });
+
+                // This should be on ajax
+                $(document).on("mouseleave keypress", ".product_category_text_input", function(){
+                    if($(this).attr("readonly") != "readonly"){
+                        // display waiting icon before sending
+                        $(this).parent().siblings(".product_category_btn").children(".waiting_icon").css("visibility", "visible");
+                        // activate ajax and send form.
+                        $(this).parent().submit(function(){ return false; });
+                        // hide waiting icon after receiving ang changing all data.
+                        setTimeout(function(){
+                            $(".waiting_icon").css("visibility", "hidden");
+                        }, 500);
+                    }
+                });
+                /**********************************************/
+                
+                /*  Show the delete category confirmation box to confirm delete    */
+                $(document).on("click", ".btn_product_category_delete", function(){
+                    resetCategoryDisplay();
+
+                    var categoryName = $(this).parent().siblings("form").children(".product_category_text_input").val();
+                    var categoryID = $(this).parent().siblings("form").children(".product_category_id").val();
+                    $(".category_name").text(categoryName);
+                    $(".category_id").val(categoryID);
                     $(".bg_category_confirm_delete").show();
                 });
 
@@ -340,6 +413,9 @@
                         });
                         return false;
                     });
+                $(document).on("click", ".category_confirm_delete input[type=submit]", function(){
+                    $("." + $(this).siblings().val()).remove();
+                    $(this).parent().submit(function(){ return false; });
                     resetCategoryDisplay();
                 });
                 /**********************************************/
