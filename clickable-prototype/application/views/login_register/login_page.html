@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | iStore</title>
+    <script src="../../../application/views/assets/js/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../../application/views/assets/css/normalize.css" />
+    <link rel="stylesheet" type="text/css" href="../../../application/views/assets/css/style.css" />
+    <script>
+        $(document).ready(function(){
+            $(document).on("submit", "form", function(){
+                window.location = "../../../application/views/admin/admin_orders_dashboard_page.html";
+                return false;
+            });
+        });
+    </script>
+</head>
+<body>
+    <header>
+        <a href="../../../application/views/product/products_page.html"><h2>iStore</h2></a>
+        <a class="nav_end" href="../../../application/views/login_register/registration_page.html"><h3>Register</h3></a>
+        
+    </header>
+    <main>
+        <div class="login_register_page">
+            <p class="message_login"></p>
+            <form class="form_login_register" action="" method="post">
+                <h2>Login</h2>
+                <span><p>Contact Number/Email: </p><input type="text" name="email_contact_number"/></span>
+                <span><p>Password: </p><input type="password" name="password"/></span>
+                <span class="btn_login_register"><input type="submit" value="Login"/></span>
+                <!-- <span class="btn_login_register"><a href="">Don't have an account? Register</a></span> -->
+            </form>
+        </div>
+    </main>
+</body>
+</html>

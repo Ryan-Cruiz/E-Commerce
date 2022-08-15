@@ -1,0 +1,15 @@
+.category_container{
+    /* outline: 1px solid black; */
+    width: 427px;
+    margin:5px 180px;
+    height: 23px;
+}
+.categories_section{
+    /* position: relative;
+    left:99px;
+    bottom:263px; */
+    
+}
+.categories_section p{
+    display:inline-block;
+}
