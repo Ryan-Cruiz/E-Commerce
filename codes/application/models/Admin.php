@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Admin extends CI_Model{
     /* QUERY TO SEE THE PRODUCT, CATEGORY, SPECIFIC CATEGORY */
-    private $query = "SELECT item_name,description,products.id,category,url,stock,price,total_sold 
+    private $query = "SELECT item_name,description,products.id,category,url,stock,price,total_sold,is_main 
     FROM products
     INNER JOIN specific_categories ON specific_categories.product_id = products.id
     INNER JOIN categories ON categories.id = specific_categories.category_id

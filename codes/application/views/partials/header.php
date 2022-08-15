@@ -5,11 +5,11 @@
             <a href="/products"><h3>Products</h3></a>
             <a class="nav_end" href="/logOut"><h3>Log off</h3></a>
         </header>
-<?php }else if(!$this->session->userdata('curr_user') && !$this->session->userdata('logged_in')){?>
+<!-- <?php }else if(!$this->session->userdata('curr_user') && !$this->session->userdata('logged_in')){?>
         <header>
             <a href="/anonymous"><h2>isStore</h2></a>
             <a class="nav_end" href="<?=$url?>"><h3><?=$title?></h3></a>
-        </header>
+        </header> -->
 <?php }else{?>
         <header>
             <a href="/dashboard"><h2>isStore</h2></a>
