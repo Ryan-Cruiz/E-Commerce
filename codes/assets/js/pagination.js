@@ -8,19 +8,10 @@
         }
     }
 $(document).ready(function(){
-      /*  Product categories selection    */
-    $(document).on("click", ".products_categories > a", function(){
-        categoryName = $(this).text().split("(")[0];
-        $(".category_name").text(categoryName);
-        $(".products > p").text(categoryName);
-        pageNumHighlight(pageNum);
-        return false;
-    });
-    
+   
     /*  Pagination at footer    */
     var pageNum = 1;
     pageNumHighlight(pageNum);
-
     $(document).on("click", ".pagination > a:not(.next_page)", function(){
         pageNum = $(this).text();
         pageNumHighlight(pageNum);
@@ -47,13 +38,7 @@ $(document).ready(function(){
         pageNumHighlight(pageNum);
         return false;
     });
-    /**********************************************/
-
-    /*  For submission of forms    */
-    $(document).on("submit", "form", function(){
-        return false;
-        pageNumHighlight(pageNum);
-    });
+   
     /**********************************************/
      
     /*  For going back from previous page    */

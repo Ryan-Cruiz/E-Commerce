@@ -13,3 +13,20 @@
 .categories_section p{
     display:inline-block;
 }
+.products_categories label{
+    display: block;
+    text-align: left;
+}
+.products_categories input,.products_categories p{
+    display:inline-block;
+    margin:10px;
+    text-align: left;
+    vertical-align: middle;
+}
+div.sort_area{
+    text-align: right;
+}
+.products_categories label:hover{
+    border: 1px solid black;
+    font-weight: bold;
+}

@@ -2,17 +2,39 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Shops extends CI_Controller{
+	public function __construct(){
+		parent::__construct();
+		$this->load->model('Shop');
+		$this->load->model('User');
+	}
     public function index(){
         $curr_session = $this->session->userdata('logged_in');
         if(!$curr_session){
-            redirect('anonymous');
+			redirect('anonymous');
         }else{
            redirect('dashboard');
 		}
     }
+	/* GUEST PAGE */
+	public function guest(){
+		$result = $this->User->validate_users();
+		if($result == 'user'){
+			redirect('dashboard');
+		}else if($result =='admin'){
+			redirect('admin');
+		}else{
+			$view_data = array('url'=> '/login',
+			'title'=>'Login');
+			$this->load->model('Shop');
+			$view_data['items'] = $this->Shop->get_all_items(1,1);
+			$view_data['categories'] = $this->Shop->count_category_item();
+			$this->load->view('product/products_page',$view_data);
+		}
+	}
+	/* LOGGED IN USERS */
     public function main(){
-		$this->load->model('Shop');
-		$view_data['items'] = $this->Shop->get_page(1);
+		$view_data['items'] = $this->Shop->get_all_items(1,1); // GET THE FIRST PAGE AND VALUE OF SELECT
+		$view_data['categories'] = $this->Shop->count_category_item();
         $this->load->view('product/products_page',$view_data);
     }
 	/* GO TO THE USER CART VIEW PAGE */
@@ -29,20 +51,31 @@ class Shops extends CI_Controller{
 	}
 	/* GET TOTAL PAGES */
 	public function page(){
-		$this->load->model('Shop');
         $view_data['pages'] = $this->Shop->the_page();
 		$this->load->view('partials/pagination',$view_data);
     }
-	/*
-	public function get_the_page($curr_page){
-		$this->load->model('Shop');
-		$view_data['items'] = $this->Shop->get_page($curr_page);
-		$view_data['pages'] = $this->Shop->the_page();
-		$this->load->view('product/products_page',$view_data);
-	}*/
+	/* TOTAL PAGE FOR JQUERY TO GET */
+	public function get_total_page(){
+        $view_data = $this->Shop->the_page();
+		echo json_encode($view_data);
+	}
+	/* GET THE CURRENT PAGE */
+	public function get_the_page($curr_page,$order,$category){
+		//$this->output->enable_profiler(true);
+		/* CHECK THE THIRD PARAMETER IF IT'S  UNDEFINED OR 0 (THIS IS NOT EFFICIENT WAY TO SEARCH BECAUSE
+		IT EATS UP 2 QUERY AND THE THIRD PARAMETER IS HANG UP UNDEFINED(I PAY FOR MY CAUSE FOR 
+		NOT CHECKING THAT IT CAN RUN ON ONE FORM(MIGHT REFACTOR THIS IF HAVE A TIME)))*/
+		if($category == 'undefined' || $category == 0){ 
+			$view_data['items'] = $this->Shop->get_all_items($curr_page,$order); 
+		}else{
+			$view_data['items'] = $this->Shop->order_by($curr_page,$order,$category); // GET THE THIRD PARAMETER
+		}
+		$this->load->view('partials/items',$view_data);
+	}
+	/* CART */
+	
 	/* ADD ITEM IN SESSION */
     public function addCart($id){
-		$this->load->model('Shop');
 		$data = $this->Shop->getID($id);
 		$item = $this->session->userdata('all_cart');
 		if($this->input->post($id)<0){

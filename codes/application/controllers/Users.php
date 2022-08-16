@@ -10,7 +10,7 @@ class Users extends CI_Controller{
 
 	/* GO TO THE LOGIN PAGE */
 	public function index(){
-		$this->guest();
+		$this->login();
 	}
 	public function login(){
 		//$this->session->set_userdata('logged_in',FALSE);
@@ -40,21 +40,7 @@ class Users extends CI_Controller{
 			$this->load->view('login_register/partials/register');
 		}
 	}
-	/* GUEST PAGE */
-	public function guest(){
-		$result = $this->User->validate_users();
-		if($result == 'user'){
-			redirect('dashboard');
-		}else if($result =='admin'){
-			redirect('admin');
-		}else{
-			$view_data = array('url'=> '/login',
-			'title'=>'Login');
-			$this->load->model('Shop');
-			$view_data['items'] = $this->Shop->get_page(1);
-			$this->load->view('product/products_page',$view_data);
-		}
-	}
+	
 	/* Form actions */
 	/* LOGIN PROCESS VALIDATING INPUT AND REDIRECTING INSIDE SHOP WITH USER */
 	public function login_event(){

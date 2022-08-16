@@ -7,7 +7,7 @@ $route['login'] = 'users/login';
 $route['register'] = 'users/register';
 $route['logOut'] = 'users/log_out';
 /* dashboard */
-$route['anonymous'] = 'users/guest';
+$route['anonymous'] = 'shops/guest';
 $route['dashboard'] = 'shops/main';
 $route['admin'] = 'admins/index';
 /* user dashboard */
@@ -15,8 +15,8 @@ $route['mycart'] = 'shops/user_cart';
 /* admin dashboard */
 $route['products'] = 'admins/product_dashboard';
 $route['order/detail'] ='admins/order_detail';
-
-
+$route['products/categories/(:num)/(:num)'] = 'shops/get_the_page/$1/$2';
+$route['products/categories/(:num)/(:num)/(:any)'] = 'shops/get_the_page/$1/$2/$3';
 
 /*
 | -------------------------------------------------------------------------
