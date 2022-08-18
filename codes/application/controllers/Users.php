@@ -11,8 +11,15 @@ class Users extends CI_Controller{
 
 	/* GO TO THE LOGIN PAGE */
 	public function index(){
-		session_destroy();
-		$this->login();
+		$result = $this->User->validate_users();
+		if($result == 'user'){
+			redirect('dashboard');
+		}else if($result =='admin'){
+			redirect('admin');
+		}else{
+			session_destroy();
+			$this->login();
+		}
 	}
 	public function login(){
 		//$this->session->set_userdata('logged_in',FALSE);

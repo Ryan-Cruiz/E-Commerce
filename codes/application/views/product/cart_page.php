@@ -13,10 +13,10 @@
             $('.a_end').hide();
             /*  For submitting forms, redirect to page    */
          
-            $(document).on("submit", "form", function(){
-                window.location = $(this).attr("action");
-                return false;
-            });
+            // $(document).on("submit", "form", function(){
+            //     window.location = $(this).attr("action");
+            //     return false;
+            // });
             /**********************************************/
             $('.cart_total_amount').change(function(){
                 if($(this).val() == 0){
@@ -51,10 +51,12 @@
             })
 
             $(document).on('click','#submit_all',function(){
-                $(this).parent().siblings('form').submit();
-                $(this).parent().submit();
-                return false;
-            })
+                // $(this).parent().siblings('form').submit();
+                $(this).parent().submit(function(){
+                    return false;
+                });
+               
+            });
             /*  Delete product when clicked    */
             $(document).on("click", ".btn_delete_product", function(){
                 $(this).
@@ -137,7 +139,9 @@
                 <span><p>City: </p><input type="text" name="city_bill" class='city_b'/></span>
                 <span><p>State: </p><input type="text" name="state_bill" class='state_b'/></span>
                 <span><p>Zipcode: </p><input type="number" name="zipcode_bill" class='zip_b'/></span>
-            
+<?php if(!$this->session->userdata('curr_user')){?>
+                <span class="card_billing"><p>Email: </p><input type="text" name='email' autocomplete='off' /></span>
+<?php }?>
                 <span class="card_billing"><p>Card: </p><input type="text"  class='card-number  required' name='card_number'autocomplete='off' /></span>
                 <span><p>Security Code: </p><input type="text" autocomplete='off' name='card_cvc' class='card-cvc required' placeholder="Ex. 311"/></span>
                 <span class="card_exp">

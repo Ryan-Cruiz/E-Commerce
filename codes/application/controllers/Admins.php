@@ -6,6 +6,7 @@ class Admins extends CI_Controller{
         parent::__construct();
         $this->load->model('User');
         $this->load->model('Admin');
+        $this->load->model('Shop');
     }
     public function index(){
       $this->order_page();
@@ -22,14 +23,26 @@ class Admins extends CI_Controller{
             redirect('anonymous');
         }
     }
+    /* ORDER PAGE DASHBOARD VIEW */
     public function order_page(){
         $this->page_redirection(array('title'=>'Order Dashboard'),'order_dashboard');
     }
-    public function product_dashboard(){
-        $data = $this->Admin->get_all_products();
+    /* PRODUCT DASHBOARD VIEW */
+    public function product_dashboard($page){
+        $data = $this->Admin->get_all_products($page);
         $category = $this->Admin->get_all_category();
-        $this->page_redirection(array('title'=>'Product Dashboard','data' => $data,'category'=> $category),'product_dashboard');
+        $page = $this->Shop->the_page();
+        $this->page_redirection(array('title'=>'Product Dashboard',
+        'data' => $data,'category'=> $category,'pages' => $page,'action' => '/products'),'product_dashboard');
     }
+    /* PRODUCT DASHBOARD SEARCH ITEM */
+    public function search_item(){
+        $category = $this->Admin->get_all_category();
+        $data = $this->Admin->search_product_item($this->input->post('admin_products_search'));
+         $this->page_redirection(array('title'=>'Product Dashboard',
+        'data' => $data,'category'=> $category,'pages' => 0,'action' => '/search'),'product_dashboard');
+    }
+    /* ORDER DETAILS HISTORY */
     public function order_detail(){
         $this->page_redirection(array('title'=>'Order Details'),'order_details');
     }
@@ -39,38 +52,53 @@ class Admins extends CI_Controller{
         echo json_encode($edit);
     }
     public function update_item(){
+        if(!$this->input->post('product_add_category')){
+            $result = $this->Admin->category_validate($this->input->post('curr_category'));
+            if($result == 0){
+                // error
+            }else{
 
-    }
-    public function add_item(){
-
-    }
-
-    public function images($category_name,$img_length){
-        for($i = 0; $i<$img_length;$i++){
-            $target_dir = '/assets/img/'.$category_name.'/'; // category file name
-            $target_file = $target_dir . basename($_FILES["myFile"]["name"]);
-            $uploadOk = 1;
-            $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-            // Check if image file is a actual image or fake image
-            $check = getimagesize($_FILES["myFile"]["tmp_name"]);
-                if($check !== false) {
-                    $uploadOk = 1;
-                }
-            // Allow certain file formats
-            if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-            && $imageFileType != "gif" ) {
-            $uploadOk = 0;
             }
-            if($uploadOk == 1) {
-                if (move_uploaded_file($_FILES["myFile"]["tmp_name"], $target_file)) {
-                } else {
-                    $alert_message[] = "Sorry, there was an error uploading your file.";
-                }
+        }else{
+            $result = $this->Admin->category_validate($this->input->post('product_add_category'));
+            if($result == 0){
+                $this->Admin->add_category($this->input->post('product_add_category'));
+            }else{
+                // error
+            }
+        }
+    }
+    public function delete_item($id){
+        $this->Admin->delete_product($id);
+        $this->Admin->get_all_category();
+    }
+    /* VALIDATE CATEGORY IF EXIST AND ADD ITEM  */
+    public function add_item(){
+        $this->output->enable_profiler(true);
+        if(!$this->input->post('product_add_category')){ // not a create new category
+            $result = $this->Admin->category_validate($this->input->post('curr_category'));
+            if($result['counts'] == 0){
+                // error
+                redirect('products/1');
+            }else{
+                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$result['id']);
+                redirect('products/1');
+            }
+        }else{ // create a new category
+            $result = $this->Admin->category_validate($this->input->post('product_add_category'));
+            if($result['counts'] == 0){
+                $category_id = $this->Admin->add_category($this->input->post('product_add_category'));
+                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$category_id);
+                redirect('products/1');
+            }else{
+                // error
+                redirect('products/1');
             }
         }
     }
 
-    /* CATEGORIES */
+    /*------------------CATEGORIES--------------------- */
+
     /* GET CATEGORIES */
     public function get_category(){
         $category['data'] = $this->Admin->get_all_category();

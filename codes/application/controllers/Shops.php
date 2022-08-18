@@ -10,8 +10,7 @@ class Shops extends CI_Controller{
     public function index(){
         $curr_session = $this->session->userdata('logged_in');
         if(!$curr_session){
-			redirect('anonymous');
-			
+			redirect('anonymous');	
         }else{
            redirect('dashboard');
 		}
@@ -34,16 +33,22 @@ class Shops extends CI_Controller{
 	}
 	/* LOGGED IN USERS */
     public function main(){
-		$view_data = array('url'=> '/logOut',
-			'title'=>'Log Out');
-		$view_data['items'] = $this->Shop->get_all_items(1,1); // GET THE FIRST PAGE AND VALUE OF SELECT
-		$view_data['categories'] = $this->Shop->count_category_item();
-        $this->load->view('product/products_page',$view_data);
+		$result = $this->User->validate_users();
+		if($result != 'user' || $result != 'admin'){
+			$view_data = array('url'=> '/login',
+			'title'=>'Login');
+		}else{
+			$view_data = array('url'=> '/logOut',
+				'title'=>'Log Out');
+			$view_data['items'] = $this->Shop->get_all_items(1,1); // GET THE FIRST PAGE AND VALUE OF SELECT
+			$view_data['categories'] = $this->Shop->count_category_item();
+			$this->load->view('product/products_page',$view_data);
+		}
     }
 	/* GO TO THE USER CART VIEW PAGE */
     public function user_cart(){
 		$result = $this->User->validate_users();
-		if($result == 'user'){
+		if($result == 'user' || $result == 'admin'){
 			$view_data = array('url'=> '/logOut',
 			'title'=>'Log Out');
 		}else{
@@ -76,9 +81,27 @@ class Shops extends CI_Controller{
 		$view_data['items'] = $this->Admin->get_product_id($id);
 		$this->load->view('product/item_page',$view_data);
 	}
+	public function success_page(){
+		$result = $this->User->validate_users();
+		
+		if($this->session->userdata('success_page')){
+			if($result == 'user'){
+				$view_data = array('url'=> '/logOut',
+				'title'=>'Log Out');
+			}else{
+				$view_data = array('url'=> '/login',
+				'title'=>'Login');
+			}
+			$this->load->view('product/order_success',$view_data);
+		}else{
+			redirect('/shops/index');
+		}
+		
+	}
 	/* GET TOTAL PAGES */
 	public function page(){
         $view_data['pages'] = $this->Shop->the_page();
+		$view_data['action'] = '/shops/get_the_page';
 		$this->load->view('partials/pagination',$view_data);
     }
 	/* TOTAL PAGE FOR JQUERY TO GET */
@@ -104,7 +127,8 @@ class Shops extends CI_Controller{
     public function add_cart($id){
 		$result = $this->User->validate_users();
 		if($result == 'user' || $result == 'admin'){
-		
+			$this->Shop->add_item($id,$this->input->post('order_qty'));
+			redirect('/shops/item_page/'.$id);
 		}else{
 			$this->Shop->add_item($id,$this->input->post('order_qty'));
 			redirect('/shops/item_page/'.$id);
@@ -120,14 +144,26 @@ class Shops extends CI_Controller{
 			redirect('/mycart');
 		}
 	}
+	public function test(){
+		echo '<pre>';
 
+		echo '</pre>';
+	}
 	/* STRIPE API PAYMENT METHOD */
 	public function handlePayment(){
-		$result = $this->Shop->billing_validator();
-		if($result != 'success'){
-			
-			redirect('mycart');
+		$billing = $this->Shop->billing_validator();
+		$shipping = $this->Shop->shipping_validator();
+		$card = $this->Shop->card_validator();
+		if($billing != 'success' && $shipping != 'success' && $card != 'success'){
+			var_dump($billing.$shipping.$card);
+			$this->session->set_flashdata('errors', $billing.$shipping.$card);
+			$this->output->enable_profiler(true);
+		//	redirect('payment/error');
 		}else{
+			$this->output->enable_profiler(true);
+			if(!$this->session->userdata('curr_user')){
+				$this->session->set_userdata('email',$this->input->post('email'));
+			}
 			$this->session->set_flashdata('success', 'Payment has been successful. Thanks For Purchasing!');
 			
 			$items = $this->session->userdata('all_cart');
@@ -145,9 +181,12 @@ class Shops extends CI_Controller{
 			\Stripe\Charge::create([
 					"amount" => $this->session->userdata('total_price')*100,
 					"currency" => "php",
-					"source" => $stripeToken,
+					"source" => $this->input->post('stripeToken'),
+					'receipt_email' => $this->session->userdata('email'),
 					"description" => '|------------------|Item Name |------------------| Quantity |------------------| Per Price |------------------| Item Total Price |------------------| '.$output
 			]);
+			$this->Shop->guest_process($this->input->post());
+			$this->session->set_userdata('success_page',TRUE);
 			redirect('payment/success'); 
 		}    
     }

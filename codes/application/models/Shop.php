@@ -117,9 +117,55 @@ class Shop extends CI_Model{
 	
     }
     /* ADD TRANSACTION INFO */
-    public function add_transaction($inputs){
+    public function user_transaction($inputs){
        
     }
+    /* PROCESS THE GUEST ITEMS */
+    public function guest_transaction($cart_id){
+       $items = $this->session->userdata('all_cart');
+       foreach($items as  $item){
+       $transaction[] = ['item' => $item['name'],'qty' => $item['qty'],
+       'price' =>$item['price'],'item_total' =>$item['item_total']];
+        }
+        $all_items = json_encode($transaction);
+        var_dump($all_items);
+        $query = "INSERT INTO transactions(item,cart_id,total_item,total_price,created_at) VALUES(?,?,?,?,NOW())";
+        $values = array($all_items,$cart_id,
+        $this->session->userdata('total_cart'),
+        $this->session->userdata('total_price'));
+        return $this->db->query($query,$values);
+    }
+    /* PROCESS THE GUEST TRANSACTION PAYOUT 
+     status 1 shipping,2 complete,3 pending(user logged in), 0 cancelled
+     type 1 will be shipping and 2 for billing*/
+    public function guest_process($inputs){
+        $guest_id = $this->insert_guest($inputs);
+        $this->insert_address($guest_id,$inputs,1,'_ship');
+        $this->insert_address($guest_id,$inputs,2,'_bill');
+        $cart_id = $this->add_to_cart($guest_id,1);
+        $this->guest_transaction($cart_id);
+    }
+    /* INSERT FIRST THE GUEST AND TAKE IT'S ID */
+    public function insert_guest($inputs){
+        return $this->db->insert_id($this->db->query("INSERT INTO guests(first_name,last_name,created_at) VALUES(?,?,NOW())"
+        ,array($this->security->xss_clean($inputs['first_name_bill']),$this->security->xss_clean($inputs['last_name_bill']))));
+    }
+    /* ADD A CART OF USER/GUEST 
+        status 1 shipping,2 complete,3 pending(user logged in), 0 cancelled*/
+    public function add_to_cart($guest_id,$status){ 
+        return $this->db->insert_id($this->db->query("INSERT INTO carts(guest_id,status,total,created_at) VALUES(?,?,?,NOW())"
+        ,array($guest_id,$status,$this->security->xss_clean($this->session->userdata('total_price')))));
+    }
+    /* INSERT ADDRESS WITH TYPE AND THE STRING TYPE I.E '_ship' and '_bill'
+        type 1 will be shipping and 2 for billing */
+    public function insert_address($guest_id,$inputs,$type,$type_string){ 
+        $query = "INSERT INTO addresses(guest_id,address,second_address,city,state,zip,add_type,created_at) VALUES(?,?,?,?,?,?,?,NOW())";
+        $values = array($guest_id,$this->security->xss_clean($inputs['address'.$type_string]),
+        $this->security->xss_clean($inputs['address2'.$type_string]),$this->security->xss_clean($inputs['city'.$type_string])
+        ,$this->security->xss_clean($inputs['state'.$type_string]),$this->security->xss_clean($inputs['zipcode'.$type_string]),$type);
+        return $this->db->query($query,$values);
+    }
+    /* BILLING VALIDATOR */
     public function billing_validator(){
         $this->load->library("form_validation");
         $this->form_validation->set_rules("first_name_ship", "Shipping First Name", "trim|required");
@@ -130,6 +176,13 @@ class Shop extends CI_Model{
         $this->form_validation->set_rules("state_ship", "Shipping State", "trim|required");
         $this->form_validation->set_rules("zipcode_ship", "Shipping Zip Code", "trim|required");
         //breakline
+        if(!$this->form_validation->run()){
+            return validation_errors();
+        }else{
+            return 'success';
+        }
+    }
+    public function shipping_validator(){
         $this->form_validation->set_rules("first_name_bill", "Billing First Name", "trim|required");
         $this->form_validation->set_rules("last_name_bill", "BillingLast Name", "trim|required");
         $this->form_validation->set_rules("address_bill", "BillingAddress", "trim|required");
@@ -138,7 +191,15 @@ class Shop extends CI_Model{
         $this->form_validation->set_rules("state_bill", "Billing State", "trim|required");
         $this->form_validation->set_rules("zipcode_bill", "Billing Zip Code", "trim|required");
         //breakline
-        $this->form_validation->set_rules("card_number", "Card Number", "trim|required|min_length[20]|max_length[20]");
+        if(!$this->form_validation->run()){
+            return validation_errors();
+        }else{
+            return 'success';
+        }   
+    }
+    public function card_validator(){
+        $this->load->library("form_validation");
+        $this->form_validation->set_rules("card_number", "Card Number", "trim|required|min_length[19]|max_length[19]");
         $this->form_validation->set_rules("card_cvc", "Card CVC/Security", "trim|required|min_length[3]|max_length[3]");
         $this->form_validation->set_rules("card_month", "Card Expiration Month", "trim|required");
         $this->form_validation->set_rules("card_year", "Card Expiration Year", "trim|required");
@@ -148,10 +209,4 @@ class Shop extends CI_Model{
             return 'success';
         }
     }
-
-
-	
-    
-
-	
 }

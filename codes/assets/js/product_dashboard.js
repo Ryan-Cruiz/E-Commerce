@@ -41,7 +41,7 @@
 
             /*  Open add new product dialog box    */
             $(document).on("click", ".btn_add_product", function(){
-                $('.admin_products_add_edit').attr('action','/admins/add_item');
+                $('.form_product_add_edit').attr('action','/admins/add_item');
                 $(".add_edit_product_header").text("Add a new product");
                 $(".input_product_name").val("");
                 $(".input_product_desc").val("");
@@ -58,7 +58,11 @@
             /**********************************************/
 
             /*  Clicking add button will submit the form using ajax    */
-            $(document).on("click", ".add_product_submit", function(){
+            $(document).on("submit", ".add_product_submit", function(){
+                $.post($(this).attr('action'),$(this).serialize(),function(res){
+                    res.preventDefault();
+                    return false;
+                });
                 var className = $("tbody tr:last-child").attr("class").split(" ");
                 var colorNum = className[0].split("color")[1];
                 var productID = className[1].split("product_id_")[1];
@@ -99,7 +103,7 @@
 
                 // ajax
                 // display message
-
+               
                 hideDialogBox();
                 return false;
             });
@@ -127,7 +131,12 @@
             // submit delete form using the general ajax. Not this!
             $(document).on("click", ".admin_product_delete input[type=submit]", function(){
                 $(".product_id_" + $(this).siblings().val()).remove();
-                $(this).parent().submit(function(){ return false; });
+                $(this).parent().submit(function(){
+                    $.post($(this).attr('action'),$(this).serialize(),function(){
+                        return false;
+                    });
+                    return false; 
+                });
                 $(".admin_product_delete").hide();
                 $(".modal_bg_delete_product").hide();
             });
@@ -138,7 +147,7 @@
              $(document).on("click", ".product_edit_link", function(){
                 var product_id = $(this).parent().parent().siblings(".product_id").text();
                 $.get("/Admins/get_edit/"+$(this).parent().parent().siblings(".product_id").text(), function(res){
-                    $('.admin_products_add_edit').attr('action','/admins/update_item/'+product_id);
+                    $('.form_product_add_edit').attr('action','/admins/update_item/'+product_id);
                     var productID = res.data[0].id;
                     var headerStr = "Edit Product - ID " + productID;
                     var productName = res.data[0].item_name;
@@ -160,7 +169,7 @@
                             '<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>' +
                         '</svg>' +
                         '<input type="hidden" name="image_name" value="'+productImgAlt+'" />' +
-                        '<input type="checkbox" class="main_img" name="img_upload_main_id" value="'+res.data[0].is_main+'" />' +
+                        '<input type="checkbox" class="main_img" name="img_upload_main_id[]" value="'+res.data[0].is_main+'" />' +
                         '<label>main</label>' +
                     '</li>';
                     }
@@ -169,6 +178,7 @@
                     $(".input_product_name").val(productName);
                     $(".input_product_desc").val(productDesc);
                     $(".dummy_select_tag span:first-child").text(productCategory);
+                    $(".current_category").val(productCategory);
                     $(".input_product_price").val(productPrice);
                     $(".input_product_qty").val(productInventory);
                     $(".img_upload_container").html(htmlImgStr);
@@ -224,9 +234,9 @@
                     categoriesOption += 
                         '<li class="product_category_edit_delete_section ' + (i+1) + '">' +
                             '\n\t<form class="form_product_category_edit form_category" action="/Admins/edit_category/'+res.data[i].id+'" method="post">' +
-                            '\n\t\t<input class="product_category_id" type="hidden" name="product_category_id" value="' + (i+1) + '"/>' +
+                            '\n\t\t<input class="product_category_id" type="hidden" name="product_category_id" value="' + res.data[i].id + '"/>' +
                                 '\n\t\t<input class="product_category_text_input" name="category" readonly type="text" value="' + res.data[i].category + '"/>' +
-                                '<input type="hidden" name="'+res.csrf.name+'" value="'+res.csrf.hash+'"/>'+
+                                 '<input type="hidden" name="'+res.csrf.name+'" value="'+res.csrf.hash+'"/>'+
                             '\n\t</form>' +
                             '\n\t<div class="product_category_btn">' +
 
@@ -280,6 +290,7 @@
                 /*  Assign the value of selected option to the dummy select tag    */
                 $(document).on("click", ".form_product_category_edit", function(){
                     if($(this).children(".product_category_text_input").attr("readonly") != null){
+                        $(".current_category").val($(this).children(".product_category_text_input").val());
                         $(".dummy_select_tag span:first-child").text($(this).children(".product_category_text_input").val());
                         resetCategoryDisplay();
                     }
@@ -297,7 +308,7 @@
                 E.G is EDITING ONE INPUT MULTIPLE TIMES WILL ADD THE SUBMISSION AND RESUBMIT IT 
                 -First edit is okay
                 -second edit will resubmit 2 times (this will also apply on 3rd and nth edits in just one entry)*/
-                $(document).on("change submit", ".form_category", function(e){
+                $(document).on("change submit", ".form_category", function(){
                     if($(this).children().attr("readonly") != "readonly"){
                         // display waiting icon before sending
                         $(this).siblings(".product_category_btn").children(".waiting_icon").css("visibility", "visible");
@@ -326,7 +337,7 @@
                     var categoryID = $(this).parent().siblings("form").children(".product_category_id").val();
                     $(".category_name").text(categoryName);
                     $(".category_id").val(categoryID);
-                    $('#delete_category').attr('action','/admins/delete_category/');
+                    $('#delete_category').attr('action','/admins/delete_category/'+categoryID);
                     $(".bg_category_confirm_delete").show();
                 });
 
@@ -334,14 +345,16 @@
                     $(".bg_category_confirm_delete").hide();
                 });
                   // submit delete form using the general ajax. Not this!
-                  $(document).on("submit", "#delete_category", function(){
-                    $("." + $(this).children().siblings().val()).remove();
-                        $.post($(this).attr('action')+$(this).children('.category_id').val(),$(this).serialize(),function(){
-                            alert('id: '+$(this).children('.category_id').val());
+                  $(document).on("submit", "#delete_category", function(res){
+                    $("." + $(this).children('.category_confirm_delete input[type=submit]').siblings().val()).remove();
+                        $.post($(this).attr('action'),$(this).serialize(),function(){
+                          //   alert('DELETED SUCCESSFULLY');
                         });
-                        return false;
-                        });
-                    resetCategoryDisplay();
+                        resetCategoryDisplay();
+                        res.preventDefault();
+                        // return false;
+                    });
+                  
                 /**********************************************/
 
                 /*  Stop propagation of clicks on dummy select tag and the confirm date box. And reset display when click outside of these elements    */
@@ -359,6 +372,7 @@
                 This codes used the FileReader from JavaScript.
                 This will render the preview of uploaded images.
             */
+            var temp = 0;
             function readURL(input) {
                 if(!input.files || !input.files[0]){
                     return false;
@@ -371,9 +385,9 @@
                 var onLoadCounter = 0;
                 reader.addEventListener('load', function(e){
                 // reader.onload = function (e) {
-                   // console.log(e);
+                    console.log(e);
                  
-                    var htmlStr = "" +
+                   var htmlStr =''+
                         '<li class="img_upload_section">' +
                             '<figure>' +
                                 '<img src="' + e.target.result + '" alt="' + input.files[onLoadCounter].name + '" />' +
@@ -383,13 +397,13 @@
                                 '<path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>' +
                                 '<path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>' +
                             '</svg>' +
-                            // '<input type="checkbox" name="is_img_upload_main_id" value="filename" />' +
                             '<input type="checkbox"  class="main_img" name="img_upload_main_id" value="0" />' +
                             '<label>main</label>' +
                         '</li>';
-                       
-                    onLoadCounter++;
-                    $(".img_upload_container").append(htmlStr);
+                     temp++;   
+                     onLoadCounter++;
+                    $("ul.img_upload_container").append(htmlStr);
+                    alert(temp);
                 // }
                 });
                 reader.readAsDataURL(input.files[0]);
@@ -400,6 +414,10 @@
                     if(counter < input.files.length){
                         reader.readAsDataURL(input.files[counter]); 
                         counter++;
+                        $('.img_upload_container  .img_upload_section').css('font-weight','normal');
+                        $('.img_upload_container  .img_upload_section:first-child').css('font-weight','bold');
+                        $('.img_upload_container  .img_upload_section').children('.main_img').val('0');
+                        $('.img_upload_container > .img_upload_section:first-child').children('.main_img').val('1');
                     }
                 }
             }
@@ -421,7 +439,7 @@
                 if($(".img_upload_section input[type=checkbox]").not(this).attr("disabled")){
                     resetCheckbox();
                     $(this).siblings().css('font-weight','normal');
-                    $(this).val('0');
+                   // $(this).val('0');
                     
                 }
                 else{
@@ -463,9 +481,11 @@
                         }
                     });
                     $('.img_upload_container  .img_upload_section').css('font-weight','normal');
-                    $('.img_upload_container  .img_upload_section:first-child').css('font-weight','bold');
+                    $('.img_upload_container > .img_upload_section:first-child').css('font-weight','bold');
+                    $('.img_upload_container  .img_upload_section').children('.main_img').val('0');
                     $(this).parent().parent().sortable("enable");
                     $(this).css("cursor", "grab");
+                    $('.img_upload_container > .img_upload_section:first-child').children('.main_img').val('1');
                 })
                 .on("mouseleave", ".img_upload_section figure",  function(){
                     $(this).parent().css("background-color", "white");
@@ -525,7 +545,7 @@
                     '<meta charset="UTF-8">' +
                     '<meta http-equiv="X-UA-Compatible" content="IE=edge">' +
                     '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-                    '<title>(Product Page) '+ prevProductName +' | isStore</title>' +
+                    '<title>(Preview Page) '+ prevProductName +' | isStore</title>' +
                     
                     '<link rel="stylesheet" type="text/css" href="/assets/css/normalize.css" />' +
                     '<link rel="stylesheet" type="text/css" href="/assets/css/style.css" />' +
@@ -548,10 +568,6 @@
             for(var i = 0; i < prevProductImg.length; i++){
                 previewWindowHTML += '<img class="sub_img" src="' + prevProductImg[i] + '" alt="img"/>'
             }
-                                        // '<img class="sub_img" src="' + prevProductImg + '" alt="img"/>' +
-                                        // '<img class="sub_img default_main_img" src="' + '" alt="img"/>' +
-                                        // '<img class="sub_img" src="' + '" alt="img"/>' +
-                                        // '<img class="sub_img" src="' + '" alt="img"/>' +
             previewWindowHTML += '' +
                                     '</section>' +
                                 '</aside>' +

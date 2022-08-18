@@ -3,7 +3,7 @@
         <header class="header_admin">
             <a href="/admin"><h2>Dashboard</h2></a>
             <a href="/admin"><h3>Orders</h3></a>
-            <a href="/products"><h3>Products</h3></a>
+            <a href="/products/1"><h3>Products</h3></a>
             <a class="nav_end" href="/logOut"><h3>Log off</h3></a>
         </header>
 <?php }else if(!$this->session->userdata('curr_user') && !$this->session->userdata('logged_in')){?>

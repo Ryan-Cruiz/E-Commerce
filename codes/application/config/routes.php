@@ -13,13 +13,14 @@ $route['admin'] = 'admins/index';
 /* user dashboard */
 $route['mycart'] = 'shops/user_cart';
 $route['handleStripePayment']['post'] = "shops/handlePayment";
-$route['payment/success'] = 'shops/user_cart';
+$route['payment/success'] = 'shops/success_page';
 $route['payment/error'] = 'shops/user_cart'; 
-/* admin dashboard */
-$route['products'] = 'admins/product_dashboard';
-$route['order/detail'] ='admins/order_detail';
 $route['products/categories/(:num)/(:num)'] = 'shops/get_the_page/$1/$2';
 $route['products/categories/(:num)/(:num)/(:any)'] = 'shops/get_the_page/$1/$2/$3';
+/* admin dashboard */
+$route['products/(:num)'] = 'admins/product_dashboard/$1';
+$route['order/detail'] ='admins/order_detail';
+$route['search'] = 'admins/search_item';
 
 /*
 | -------------------------------------------------------------------------

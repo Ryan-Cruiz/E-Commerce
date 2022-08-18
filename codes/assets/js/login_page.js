@@ -11,6 +11,7 @@ $(document).ready(function(){
     //     // return false;
     // });
     $('.div_end').hide();
+    $('.a_end').show();
     $('.store_page').click(function(){
         $('.a_end').hide();
         $('.div_end').show();   

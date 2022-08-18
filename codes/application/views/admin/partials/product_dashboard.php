@@ -1,8 +1,9 @@
         <main>
             <p class="message_admin_products"></p>
             <section class="form_admin_products">
-                <form class="form_admin_products_search" action="" method="post">
+                <form class="form_admin_products_search" action="/search" method="post">
                <input type="search" name="admin_products_search" placeholder="Search" />&#x1F50D;
+               <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
                 </form>
                 <!-- <form class="form_admin_products_add" action="" method="post">
                     <input class="btn_add_product" type="submit" name="add_product" value="Add new product" />
@@ -26,9 +27,9 @@
                 <tbody>
 <?php $num=0;foreach($data as $d){?>
 <?php if($num%2 == 0){?>
-                    <tr class="color0 product_id_1">
+                    <tr class="color0 product_id_<?=$d['id']?>">
 <?php }else{?>
-                    <tr class="color1 product_id_2">
+                    <tr class="color1 product_id_<?=$d['id']?>">
 <?php } $num++;?>
                         <td><img src="<?=$d['url']?>" alt="<?=$d['item_name']?>"></td>
                         <td class="product_id"><?=$d['id']?></td>
@@ -43,19 +44,7 @@
 <?php }?>
                 </tbody>
             </table>
-            <section class="pagination">
-                    <a href="">1</a><!--
-                --><a href="">2</a><!--
-                --><a href="">3</a><!--
-                --><a href="">4</a><!--
-                --><a href="">5</a><!--
-                --><a href="">6</a><!--
-                --><a href="">7</a><!--
-                --><a href="">8</a><!--
-                --><a href="">9</a><!--
-                --><a href="">10</a><!--
-                --><a class="next_page" href="">&rsaquo;</a>
-                </section>
+<?php $this->load->view('partials/pagination')?>
         </main>
         <div class="admin_product_delete">
             <p>Are you sure you want to delete product "<span class="delete_product_name">Product Name</span>" (ID: <span class="delete_product_id">ID</span>)</p>
@@ -82,6 +71,7 @@
                 <p>Name: </p><input class="input_product_name" type="text" name="product_name"/>
                 <p>Description: </p><textarea class="input_product_desc" name="product_desc"></textarea>
                 <p>Categories: </p>
+                <input type="hidden" name="curr_category" class='current_category' value=''>
                 <div class="select_tag_container">
                     <button class="dummy_select_tag" type="button"><span></span><span>&#9660;</span></button>
                     <ul class="product_categories"></ul>
@@ -89,7 +79,7 @@
                 <p>or add new category: </p><input type="text" name="product_add_category"/>
                 <p>Price: </p><input class="input_product_price" type="number" name="product_price" min="0.01" step="0.01"/>
                 <p>Quantity (Inventory): </p><input class="input_product_qty" type="number" name="product_qty"/>
-                <p class="img_field_name">Images: </p><input id="img_upload" type="file" name="product_img_file" multiple accept=".png, .jpg, .jpeg" />
+                <p class="img_field_name">Images: </p><input id="img_upload" type="file" name="myFile[]" multiple accept=".png, .jpg, .jpeg, .webp, .jfif" />
                 <label class="file_upload_label" for="img_upload">Upload</label>
                 <ul class="img_upload_container">
                 </ul>
@@ -117,7 +107,6 @@
         </dialog>
         <script src="/assets/js/product_dashboard.js"></script>
         <script>
-            $('.form_product_add_edit')
         </script>
     </body>
 </html>

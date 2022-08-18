@@ -52,12 +52,9 @@ class User extends CI_Model{
     }
     /* INSERT GUEST AND TAKE ITS ID FOR IT TO USE IN OTHER TABLE */
     public function insert_guest($user){
-        $query = "INSERT INTO guests(first_name,last_name,created_at) VALUES (?,?,?)";
-        $values = array(
-            $this->security->xss_clean($user['first_name']),
-            $this->security->xss_clean($user['last_name']),
-            date("Y-m-d, H:i:s")); 
-            return $this->db->insert_id($this->db->query($query, $values));
+        $query = "INSERT INTO guests(first_name,last_name,created_at) VALUES (?,?,NOW())";
+        $values = array($this->security->xss_clean($user['first_name']),$this->security->xss_clean($user['last_name'])); 
+        return $this->db->insert_id($this->db->query($query, $values));
     }
     /* INSERT NEW ACCOUNT - There's an error on insert_id but it's working (if error is showing only), I
         just ignore it*/
