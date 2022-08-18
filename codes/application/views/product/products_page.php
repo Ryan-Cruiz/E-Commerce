@@ -12,6 +12,7 @@
         <script src="/assets/js/jquery.min.js"></script>
         <script>
             $(document).ready(function(){
+                $('.a_end').hide();
                 /* LOAD THE PAGES */  
                 /*
                 LITTLE REMINDER AS YOU TRAVERSE THIS MAKE SURE YOU TURN ON THE profiler IN THE shops/get_the_page
@@ -41,6 +42,11 @@
                     })
                     return false;
                 });
+                $(document).on('click','.products_categories > label',function(){
+                    categoryName = $(this).text().split("(")[0];
+                    $(".category_name").text(categoryName);
+                    pageNumHighlight(pageNum);
+                })
                 /* TOTAL PAGE IN ITEM */
                 $.get('/shops/get_total_page', function(res){
                     /* CLICK THESE BADBOI HREFS */
@@ -55,6 +61,7 @@
                             $('.products_container').html(data);
                         });
                         pageNum = $(this).text();
+                        $('.page_number').text($(this).text());
                     });
                     /* FIRST PAGE PAGINATION */
                     $(document).on('click', '.first_page', function(){
@@ -155,7 +162,7 @@
             </aside>
                 <article class="catalog">
                     <div class="subheader">
-                        <h2><span class="category_name">T-shirts</span> (page <span class="page_number">1</span>)</h2>
+                        <h2><span class="category_name">All Products</span> (page <span class="page_number">1</span>)</h2>
                         <section class="pagination_top">
                             <a class="first_page" href="">first</a>
                             <a class="prev_page" href="">prev</a>

@@ -511,3 +511,8 @@ $config['rewrite_short_tags'] = FALSE;
 | Array:		array('10.0.1.200', '192.168.5.0/24')
 */
 $config['proxy_ips'] = '';
+#--------------------------------------------------------------------
+# Stripe
+#--------------------------------------------------------------------
+$config['stripe_key'] = 'pk_test_51LRqRAIjLrsA4tm1WozJmhiRSKTVKg7Q87eefz4e5XeOg1ZRzo6GXqbgnAghNx0EUpEkvoPJuAaKJARZxCBioUkW00QFpZXOYb';
+$config['stripe_secret'] = 'sk_test_51LRqRAIjLrsA4tm1W2OY5aUn67VocGl7NYEcWd7DePCKHSegCym10q98dYVUFLV7a4efu4p3O7juAyn6ABkoBL1K00qPBufC2P';

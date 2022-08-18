@@ -11,6 +11,7 @@ class Shops extends CI_Controller{
         $curr_session = $this->session->userdata('logged_in');
         if(!$curr_session){
 			redirect('anonymous');
+			
         }else{
            redirect('dashboard');
 		}
@@ -33,19 +34,45 @@ class Shops extends CI_Controller{
 	}
 	/* LOGGED IN USERS */
     public function main(){
+		$view_data = array('url'=> '/logOut',
+			'title'=>'Log Out');
 		$view_data['items'] = $this->Shop->get_all_items(1,1); // GET THE FIRST PAGE AND VALUE OF SELECT
 		$view_data['categories'] = $this->Shop->count_category_item();
         $this->load->view('product/products_page',$view_data);
     }
 	/* GO TO THE USER CART VIEW PAGE */
     public function user_cart(){
-        $view_data = array('url'=> '/login',
+		$result = $this->User->validate_users();
+		if($result == 'user'){
+			$view_data = array('url'=> '/logOut',
+			'title'=>'Log Out');
+		}else{
+			$view_data = array('url'=> '/login',
 			'title'=>'Login');
+		}
+	//	$view_data['data'] = $this->Shop->getAll();
+		if($this->session->userdata('all_cart') == TRUE){
+			$items = $this->session->userdata('all_cart');
+			$view_data['item_bought'] = $items;
+		}else{
+			$this->session->set_userdata('total_cart',0);
+			$this->session->set_userdata('total_price',0);
+			$view_data['item_bought'] = array();
+		}
         $this->load->view('product/cart_page',$view_data);
     }
 	/* IF ITEM IS CLICK GO TO IT'S INFO VIEW PAGE */
 	public function item_page($id){
+		$result = $this->User->validate_users();
+		if($result == 'user'){
+			$view_data = array('url'=> '/logOut',
+			'title'=>'Log Out');
+		}else{
+			$view_data = array('url'=> '/login',
+			'title'=>'Login');
+		}
 		$this->load->model('Admin');
+		$view_data['similar'] = $this->Shop->get_similar_item($id);
 		$view_data['items'] = $this->Admin->get_product_id($id);
 		$this->load->view('product/item_page',$view_data);
 	}
@@ -72,51 +99,56 @@ class Shops extends CI_Controller{
 		}
 		$this->load->view('partials/items',$view_data);
 	}
-	/* CART */
-	
+
 	/* ADD ITEM IN SESSION */
-    public function addCart($id){
-		$data = $this->Shop->getID($id);
-		$item = $this->session->userdata('all_cart');
-		if($this->input->post($id)<0){
-			$this->session->set_flashdata('errors','INVALID');
-			redirect('','refresh');
+    public function add_cart($id){
+		$result = $this->User->validate_users();
+		if($result == 'user' || $result == 'admin'){
+		
 		}else{
-			$item[$id] = ['name' => $data['item_name'],'qty'=>$this->security->xss_clean($this->input->post($id)),'price' => $data['price']];
-			echo '<pre>';
-			$this->session->set_userdata('all_cart',$item);
-			echo '</pre>';
-			$curr_cart = 0;
-			$total_price = 0;
-			foreach($item as $total){
-				$curr_cart = $curr_cart + $total['qty'];
-				$total_price += $total['qty'] * $total['price'];
-				$this->session->set_userdata('total_cart',$curr_cart);
-				$this->session->set_userdata('total_price',$total_price);
-			}
-	
-	//  echo '<pre>';
-	//  var_dump($this->session->userdata());
-	//  echo '</pre>';
-	redirect('http://reshopping.localhost','refresh');
+			$this->Shop->add_item($id,$this->input->post('order_qty'));
+			redirect('/shops/item_page/'.$id);
 		}
     }
 	/* DESTROY AN ITEM IN SESSION */
 	public function destroy($id){
-	$view_data = $this->session->userdata('all_cart');
-		unset($view_data[$id]);
-		$curr_cart = 0;
-		$total_price = 0;
-		foreach($view_data as $total){
-			$curr_cart = $curr_cart + $total['qty'];
-			$total_price += $total['qty'] * $total['price'];
-			$this->session->set_userdata('total_cart',$curr_cart);
-			$this->session->set_userdata('total_price',$total_price);
+		$result = $this->User->validate_users();
+		if($result == 'user' || $result == 'admin'){
+		
+		}else{
+			$this->Shop->delete_item($id);
+			redirect('/mycart');
 		}
-		$this->session->set_userdata('all_cart',$view_data);
-	//  echo '<pre>';
-	//  var_dump($this->session->userdata());
-	//  echo '</pre>';
-		redirect('http://reshopping.localhost/cart','refresh');
 	}
+
+	/* STRIPE API PAYMENT METHOD */
+	public function handlePayment(){
+		$result = $this->Shop->billing_validator();
+		if($result != 'success'){
+			
+			redirect('mycart');
+		}else{
+			$this->session->set_flashdata('success', 'Payment has been successful. Thanks For Purchasing!');
+			
+			$items = $this->session->userdata('all_cart');
+			require_once('application/libraries/stripe-php/init.php');
+			$output ='';
+			foreach($items as $item){
+				$output .= " |------------------| 
+				{$item['name']} |------------------| 
+				{$item['qty']} |------------------| 
+				{$item['price']} |------------------| 
+				{$item['name']}";	
+				echo '<br>';
+			}
+			\Stripe\Stripe::setApiKey($this->config->item('stripe_secret'));
+			\Stripe\Charge::create([
+					"amount" => $this->session->userdata('total_price')*100,
+					"currency" => "php",
+					"source" => $stripeToken,
+					"description" => '|------------------|Item Name |------------------| Quantity |------------------| Per Price |------------------| Item Total Price |------------------| '.$output
+			]);
+			redirect('payment/success'); 
+		}    
+    }
 }

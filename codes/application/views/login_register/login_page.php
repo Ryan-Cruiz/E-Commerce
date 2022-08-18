@@ -12,5 +12,6 @@
     </head>
     <body>
 <?php $this->load->view('partials/header')?>
+
     </body>
 </html>

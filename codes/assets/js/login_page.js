@@ -10,5 +10,13 @@ $(document).ready(function(){
     //      });
     //     // return false;
     // });
-
+    $('.div_end').hide();
+    $('.store_page').click(function(){
+        $('.a_end').hide();
+        $('.div_end').show();   
+    });
+    $('.log_reg').click(function(){
+        $('.div_end').hide();
+        $('.a_end').show();
+    });
 });

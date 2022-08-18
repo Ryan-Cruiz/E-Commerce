@@ -5,11 +5,13 @@ class Users extends CI_Controller{
 	public function __construct(){
 		parent::__construct();
 		$this->load->model('User');
+		
 	}
 	/* VIEW PAGES */
 
 	/* GO TO THE LOGIN PAGE */
 	public function index(){
+		session_destroy();
 		$this->login();
 	}
 	public function login(){

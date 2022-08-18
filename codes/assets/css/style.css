@@ -336,13 +336,18 @@ figure.item{
     .item_panel form select{
         width: 140px;
     }
-    .item_panel input[type=submit]{
+    .item_panel input[type=submit],.item_panel input[type=button]{
         width: 100px;
         background-color: rgb(6, 184, 6);
         color: white;
     }
     p.item_added_confirm{
         background-color: rgb(6, 184, 6);
+    }
+    p.item_error{
+        background-color: rgb(207, 32, 32);
+    }
+    p.item_added_confirm,p.item_error{
         color: white;
         border-radius: 4px;
         position: absolute;

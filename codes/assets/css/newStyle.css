@@ -25,6 +25,7 @@
 }
 div.sort_area{
     text-align: right;
+    margin:10px;
 }
 .products_categories label:hover{
     border: 1px solid black;

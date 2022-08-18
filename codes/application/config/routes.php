@@ -12,6 +12,9 @@ $route['dashboard'] = 'shops/main';
 $route['admin'] = 'admins/index';
 /* user dashboard */
 $route['mycart'] = 'shops/user_cart';
+$route['handleStripePayment']['post'] = "shops/handlePayment";
+$route['payment/success'] = 'shops/user_cart';
+$route['payment/error'] = 'shops/user_cart'; 
 /* admin dashboard */
 $route['products'] = 'admins/product_dashboard';
 $route['order/detail'] ='admins/order_detail';
