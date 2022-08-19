@@ -3,7 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Admin extends CI_Model{
     /* QUERY TO SEE THE PRODUCT, CATEGORY, SPECIFIC CATEGORY */
-    private $query = "SELECT item_name,description,products.id,category,stock,price,total_sold,url,is_main
+    private $query = "SELECT item_name,categories.id as c_id,description,products.id as p_id,category,stock,price,total_sold,url,is_main
         FROM specific_categories
         INNER JOIN  products ON  products.id = specific_categories.product_id
         INNER JOIN categories ON categories.id = specific_categories.category_id
@@ -54,7 +54,7 @@ class Admin extends CI_Model{
     }
       /* SEARCH ITEM PRODUCT */
     public function search_product_item($input){
-            return $this->db->query($this->query." WHERE item_name LIKE ? AND is_main = 1",array($this->security->xss_clean($input.'%')))->result_array();
+            return $this->db->query($this->query." WHERE item_name LIKE ? OR id = ? AND is_main = 1",array($this->security->xss_clean($input.'%'),$this->security->xss_clean($input)))->result_array();
     }
     /* SEARCH ORDER ID */
     public function search_order($input){
@@ -74,15 +74,15 @@ class Admin extends CI_Model{
             if($check !== false) {
                 $uploadOk = 1;
             }
-            if (file_exists($target_file)) {
-               // echo "Sorry, file already exists.";
-              // $target_file = $target_dir .'dupName_'.$i.'_'. basename($_FILES['myFile']['name'][$i]);
-                $uploadOk = 0;
-                }
+            // if (file_exists($target_file)) {
+            //    // echo "Sorry, file already exists.";
+            //   // $target_file = $target_dir .'dupName_'.$i.'_'. basename($_FILES['myFile']['name'][$i]);
+            //     $uploadOk = 0;
+            //     }
             // Allow certain file formats
             if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
             && $imageFileType != "gif" && $imageFileType != 'webp' && $imageFileType != 'jfif' ) {
-            $uploadOk = 0;
+                $uploadOk = 0;
             }
             if($uploadOk == 1) {
                 if(!move_uploaded_file($_FILES['myFile']["tmp_name"][$i], $target_file)){
@@ -143,10 +143,51 @@ class Admin extends CI_Model{
     }
     /* DELETE CATEGORY QUERY */
     public function delete_category($id){
+        $this->db->query('DELETE FROM specific_categories WHERE category_id = ?',array($this->security->xss_clean($id)));
         return $this->db->query('DELETE FROM categories WHERE id = ?',array($this->security->xss_clean($id)));
     }
     /* -------------------END OF CATEGORY ----------------------- */
-  
 
-    
+    /* ----------------------HISTORY----------------------------- */
+   /* status 1 shipping,2 complete,3 pending(user logged in), 0 cancelled
+        type 1 will be shipping and 2 for billing */
+    private $history_query = "SELECT c.id as c_id,t.id as t_id,g.first_name,t.created_at,address,c.total,status_type FROM transactions as t
+        INNER JOIN carts as c ON cart_id = c.id 
+        INNER JOIN guests as g ON c.guest_id = g.id
+        INNER JOIN addresses as a ON a.guest_id = g.id WHERE add_type = 2";
+
+    public function get_history(){
+        return $this->db->query($this->history_query)->result_array();
+    }
+    /* -------------------VALIDATIONS----------------------------*/
+    public function is_category_exist($inputs,$current_category){
+        $result = $this->category_validate($this->security->xss_clean($current_category));
+        if(!$current_category){ // not a create new category
+            if($result['counts'] != 0){
+                $this->add_product($inputs,$current_category,$result['id']);
+            }
+        }else{ // create a new category
+            if($result['counts'] == 0){
+                $category_id = $this->Admin->add_category($current_category);
+                $this->add_product($inputs,$current_category,$category_id);
+            }
+        }
+    }
+    public function get_status($status,$cart_id){
+        return $this->db->query("UPDATE carts SET status_type = ?, updated_at = NOW() WHERE id =?"
+        ,array($this->security->xss_clean($status),$this->security->xss_clean($cart_id)));
+    }
+    /* SEARCH THE STATUS AND SEARCH INPUT */
+    public function search_status($table,$status,$page){
+        $record_per_page = 3;
+        if(!isset($page)){
+            $page = 1;
+        }
+            $start = ($page-1)* $record_per_page;
+        return $this->db->query($this->history_query." OR $table = ? LIMIT $start,$record_per_page"
+        ,array($this->security->xss_clean($status)))->result_array();
+    }
+    public function order_detail($id){
+        return $this->db->query("")->result_array();
+    }
 }

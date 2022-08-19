@@ -1,13 +1,16 @@
         <main>
             <p class="message_admin_orders"></p>
-            <form class="form_admin_orders" action="" method="post">
-                <input type="search" name="admin_orders_search" placeholder="&#x1F50D; search" />
-                <select name="admin_orders_status">
-                    <option value="0">Show All</option>
+            <form class="form_admin_orders" action="/Admins/search_status" method="post" id='searh_form'>
+                <input type="search" name="admin_orders_search" id='search_input'placeholder="&#x1F50D; search" />
+                <select name="admin_orders_status" id='select_status'>
+                    <option value="">Show All</option>
                     <option value="1">Order in process</option>
                     <option value="2">Shipped</option>
-                    <option value='3'>Cancelled</option>
+                    <option value='0'>Cancelled</option>
                 </select>
+                <input type="submit" value="Search">
+                <a href="/admin">Clear selection</a>
+                <input type="hidden" name="<?= $this->security->get_csrf_token_name()?>" value="<?=$this->security->get_csrf_hash();?>">
             </form>
             <table class="admin_orders_table">
                 <thead>
@@ -20,58 +23,8 @@
                         <th>Status</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td><a href="/order/detail">100</a></td>
-                        <td>Bob</td>
-                        <td>9/6/2014</td>
-                        <td>123 dojo way Bellevue WA 98005</td>
-                        <td>$149.99</td>
-                        <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="product_id" value="product_id"/>
-                                <select name="admin_orders_update" class="option_search">
-                                    <option>Order in process</option>
-                                    <option selected>Shipped</option>
-                                    <option>Cancelled</option>
-                                </select>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr class="color1">
-                        <td><a class='details' href="/order/detail">99</a></td>
-                        <td>Bob</td>
-                        <td>9/6/2014</td>
-                        <td>123 dojo way Bellevue WA 98005</td>
-                        <td>$149.99</td>
-                        <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="product_id" value="product_id"/>
-                                <select name="admin_orders_update" class="option_search">
-                                    <option>Order in process</option>
-                                    <option selected>Shipped</option>
-                                    <option>Cancelled</option>
-                                </select>
-                            </form>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td><a href="/order/detail">98</a></td>
-                        <td>Bob</td>
-                        <td>9/6/2014</td>
-                        <td>123 dojo way Bellevue WA 98005</td>
-                        <td>$149.99</td>
-                        <td>
-                            <form action="" method="post">
-                                <input type="hidden" name="product_id" value="product_id"/>
-                                <select name="admin_orders_update" class="option_search">
-                                    <option value="1">Order in process</option>
-                                    <option value="2" selected>Shipped</option>
-                                    <option value="3">Cancelled</option>
-                                </select>
-                            </form>
-                        </td>
-                    </tr>
+                <tbody id='tbody'>
+<?php $this->load->view('admin/partials/table_part');?>
                 </tbody>
             </table>
             <section class="pagination">
@@ -88,5 +41,13 @@
             --><a class="next_page" href="">&rsaquo;</a>
             </section>
         </main>
+        <script>
+            $(document).on('change','#update_status',function(){
+                $.post($(this).attr('action'),$(this).serialize(),function(){
+                    alert('Status Edit Success!');
+                    return false;
+                });
+            });
+        </script>
     </body>
 </html>

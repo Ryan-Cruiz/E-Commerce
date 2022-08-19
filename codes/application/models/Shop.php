@@ -2,12 +2,12 @@
 defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Shop extends CI_Model{
-    private $query = "SELECT item_name,description,products.id,category,stock,price,total_sold,url,is_main
+    private $query = "SELECT item_name,categories.id as c_id,description,products.id as p_id,category,stock,price,total_sold,url,is_main
         FROM specific_categories
             INNER JOIN  products ON  products.id = specific_categories.product_id
             INNER JOIN categories ON categories.id = specific_categories.category_id
             LEFT JOIN product_images ON product_images.product_id = products.id WHERE is_main = 1";
-    public function get_all_items($page,$order){
+    public function get_all_items($page,$order,$search){
         $record_per_page = 3;
         $value = '';
         if(!isset($page)){
@@ -21,7 +21,7 @@ class Shop extends CI_Model{
         }else{
             $value = 'ORDER BY price ASC';
         }
-        return $this->db->query($this->query." $value LIMIT $start,$record_per_page")->result_array();
+        return $this->db->query($this->query." AND item_name LIKE ? $value LIMIT $start,$record_per_page",array($this->security->xss_clean($search.'%')))->result_array();
     }
     public function count_category_item(){
         return $this->db->query("SELECT categories.id,category,count(*) as counts
@@ -39,11 +39,17 @@ class Shop extends CI_Model{
         return $this->db->query($query." $order LIMIT $start,$record_per_page",array($this->security->xss_clean($values)))->result_array();
     }
     /* GET ALL TOTAL PAGE */
-    public function the_page(){
+    public function the_page($table,$condition){
         $record_per_page = 3;
-        $page = $this->db->query("SELECT count(*) as page FROM products")->row_array();
+        $page = $this->db->query("SELECT count(*) as page FROM ".$table,$condition)->row_array();
         $total = ceil($page['page']/ $record_per_page);
         return $total;
+    }
+    public function get_category_page($category_id){
+       return $this->the_page("specific_categories WHERE category_id = ?",array($this->security->xss_clean($category_id)));
+    }
+    public function all_category(){
+       return $this->the_page("specific_categories",array());
     }
     public function order_by($page,$order,$category){
         $value = '';
@@ -56,14 +62,9 @@ class Shop extends CI_Model{
         }
        return $this->get_page($this->query." AND category_id = ?",$this->security->xss_clean($category),$this->security->xss_clean($page),$value);
     }
-    public function get_similar_item($id){
-        $this->load->model("Admin");
-        $data =  $this->Admin->get_product_id($this->security->xss_clean($id));
-        return $this->db->query("SELECT products.id,item_name,price,url FROM products
-        INNER JOIN specific_categories ON products.id = specific_categories.product_id
-        INNER JOIN categories ON specific_categories.category_id = categories.id
-        INNER JOIN product_images ON product_images.product_id = products.id
-        WHERE NOT products.id = ? AND is_main = 1 AND item_name LIKE '{$data[0]['item_name']}%'",array($this->security->xss_clean($id)),)->result_array();
+    public function get_similar_item($product_id){
+        $data = $this->db->query("SELECT category_id FROM specific_categories WHERE product_id = ?",array($this->security->xss_clean($product_id)))->row_array();
+        return $this->db->query($this->query." AND NOT products.id = ? AND is_main = 1 AND categories.id = '{$data['category_id']}'",array($this->security->xss_clean($product_id)))->result_array();
     }
     /* CART */
     /* ADD ITEM IN SESSION 
@@ -182,6 +183,7 @@ class Shop extends CI_Model{
             return 'success';
         }
     }
+    /* SHIPPING VALIDATION */
     public function shipping_validator(){
         $this->form_validation->set_rules("first_name_bill", "Billing First Name", "trim|required");
         $this->form_validation->set_rules("last_name_bill", "BillingLast Name", "trim|required");
@@ -197,6 +199,7 @@ class Shop extends CI_Model{
             return 'success';
         }   
     }
+    /* CARD VALIDATION */
     public function card_validator(){
         $this->load->library("form_validation");
         $this->form_validation->set_rules("card_number", "Card Number", "trim|required|min_length[19]|max_length[19]");

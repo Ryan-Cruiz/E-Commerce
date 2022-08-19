@@ -6,7 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/assets/css/normalize.css" />
     <link rel="stylesheet" type="text/css" href="/assets/css/style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?=$items[0]['item_name']?> | isStore</title>
+    <title><?=$product[0]['item_name']?> | isStore</title>
     <script src="/assets/js/jquery.min.js"></script>
     <script src="/assets/js/pagination.js"></script>
     <script>
@@ -54,22 +54,22 @@
             <a class="go_back" href=""><p>Go Back</p></a>
             <div class="item_details">
                 <aside class="img_section">
-                    <img class="main_img" src="<?=$items[0]['url']?>" alt="<?=$items[0]['item_name']?>"/>        
+                    <img class="main_img" src="<?=$product[0]['url']?>" alt="<?=$product[0]['item_name']?>"/>        
                     <section>
-<?php foreach($items as $item){?>
-                        <img class="sub_img" src="<?=$item['url']?>" alt="<?=$item['item_name']?>"/>
+<?php foreach($product as $products){?>
+                        <img class="sub_img" src="<?=$products['url']?>" alt="<?=$products['item_name']?>"/>
 <?php }?>
                     </section>
                 </aside>
                 <aside class="desc_section">
-                    <h2><?=$items[0]['item_name']?></h2>
-                    <p><?=$items[0]['description']?></p>
-                    <form action="/shops/add_cart/<?=$items[0]['id']?>" method="post">
+                    <h2><?=$product[0]['item_name']?></h2>
+                    <p><?=$product[0]['description']?></p>
+                    <form action="/shops/add_cart/<?=$product[0]['p_id']?>" method="post">
                         <input type="hidden" name="product_id" value="product_id"/>
                         <select class="new_order_qty" name='order_quantity' id='order_quantity'>
-                            <option value='1'>1 (₱<?=$items[0]['price']?>)</option>
-                            <option value='2'>2 (₱<?=$items[0]['price']*2?>)</option>
-                            <option value='3'>3 (₱<?=$items[0]['price']*3?>)</option>
+                            <option value='1'>1 (₱<?=$product[0]['price']?>)</option>
+                            <option value='2'>2 (₱<?=$product[0]['price']*2?>)</option>
+                            <option value='3'>3 (₱<?=$product[0]['price']*3?>)</option>
                         </select>
                         <input type="hidden" name="order_qty" id='order_qty' value='1'>
                         <input type="submit" value="Buy"/>
@@ -82,15 +82,7 @@
         </section>
         <article class="similar_items_section">
             <h3>Similar Items</h3>
-<?php foreach($similar as $sim){?>
-            <section class="products">
-                <figure class="item">
-                    <a href="/shops/item_page/<?=$sim['id']?>"><img src="<?=$sim['url']?>" alt="<?=$sim['item_name']?>"/></a>
-                    <h4>₱<?=$sim['price']?></h4>
-                </figure>
-                <p><?=$sim['item_name']?></p>
-            </section>
-<?php }?>
+<?php $this->load->view('partials/items')?>
             <section class="pagination">
                 <a href="">1</a><!--
              --><a href="">2</a><!--

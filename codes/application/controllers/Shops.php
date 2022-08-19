@@ -26,7 +26,7 @@ class Shops extends CI_Controller{
 			$view_data = array('url'=> '/login',
 			'title'=>'Login');
 			$this->load->model('Shop');
-			$view_data['items'] = $this->Shop->get_all_items(1,1);
+			$view_data['items'] = $this->Shop->get_all_items(1,1,'');
 			$view_data['categories'] = $this->Shop->count_category_item();
 			$this->load->view('product/products_page',$view_data);
 		}
@@ -34,16 +34,17 @@ class Shops extends CI_Controller{
 	/* LOGGED IN USERS */
     public function main(){
 		$result = $this->User->validate_users();
-		if($result != 'user' || $result != 'admin'){
-			$view_data = array('url'=> '/login',
-			'title'=>'Login');
-		}else{
+		if($result == 'user' || $result == 'admin'){
 			$view_data = array('url'=> '/logOut',
 				'title'=>'Log Out');
-			$view_data['items'] = $this->Shop->get_all_items(1,1); // GET THE FIRST PAGE AND VALUE OF SELECT
+		
+		}else{
+			$view_data = array('url'=> '/login',
+			'title'=>'Login');
+		}
+			$view_data['items'] = $this->Shop->get_all_items(1,1,''); // GET THE FIRST PAGE AND VALUE OF SELECT
 			$view_data['categories'] = $this->Shop->count_category_item();
 			$this->load->view('product/products_page',$view_data);
-		}
     }
 	/* GO TO THE USER CART VIEW PAGE */
     public function user_cart(){
@@ -67,7 +68,7 @@ class Shops extends CI_Controller{
         $this->load->view('product/cart_page',$view_data);
     }
 	/* IF ITEM IS CLICK GO TO IT'S INFO VIEW PAGE */
-	public function item_page($id){
+	public function item_page($product_id){
 		$result = $this->User->validate_users();
 		if($result == 'user'){
 			$view_data = array('url'=> '/logOut',
@@ -77,8 +78,8 @@ class Shops extends CI_Controller{
 			'title'=>'Login');
 		}
 		$this->load->model('Admin');
-		$view_data['similar'] = $this->Shop->get_similar_item($id);
-		$view_data['items'] = $this->Admin->get_product_id($id);
+		$view_data['items'] = $this->Shop->get_similar_item($product_id);
+		$view_data['product'] = $this->Admin->get_product_id($product_id);
 		$this->load->view('product/item_page',$view_data);
 	}
 	public function success_page(){
@@ -99,14 +100,22 @@ class Shops extends CI_Controller{
 		
 	}
 	/* GET TOTAL PAGES */
-	public function page(){
-        $view_data['pages'] = $this->Shop->the_page();
+	public function page($status){
+		if($status == 0 || $status == 'undefined' || $status == NULL){
+			$view_data['pages'] = $this->Shop->all_category();
+		}else{
+			$view_data['pages'] = $this->Shop->get_category_page($this->input->post('category'));
+		}
 		$view_data['action'] = '/shops/get_the_page';
 		$this->load->view('partials/pagination',$view_data);
     }
 	/* TOTAL PAGE FOR JQUERY TO GET */
 	public function get_total_page(){
-        $view_data = $this->Shop->the_page();
+		if($this->input->post('category')){
+			$view_data =$this->Shop->get_category_page($this->input->post('category'));
+		}else{
+			$view_data = $this->Shop->all_category();
+		}
 		echo json_encode($view_data);
 	}
 	/* GET THE CURRENT PAGE */
@@ -116,13 +125,18 @@ class Shops extends CI_Controller{
 		IT EATS UP 2 QUERY AND THE THIRD PARAMETER IS HANG UP UNDEFINED(I PAY FOR MY CAUSE FOR 
 		NOT CHECKING THAT IT CAN RUN ON ONE FORM(MIGHT REFACTOR THIS IF HAVE A TIME)))*/
 		if($category == 'undefined' || $category == 0){ 
-			$view_data['items'] = $this->Shop->get_all_items($curr_page,$order); 
+			$view_data['items'] = $this->Shop->get_all_items($curr_page,$order,$this->input->post('product_name')); 
+		}else if($this->input->post('product_name')){
+			$view_data['items'] = $this->Shop->get_all_items($curr_page,$order,$this->input->post('product_name'));
 		}else{
 			$view_data['items'] = $this->Shop->order_by($curr_page,$order,$category); // GET THE THIRD PARAMETER
 		}
 		$this->load->view('partials/items',$view_data);
 	}
-
+	public function search_product(){
+		$view_data['items'] = $this->Shop->get_all_items(1,1,$this->input->post('product_name'));
+		$this->load->view('partials/items',$view_data); 
+	}
 	/* ADD ITEM IN SESSION */
     public function add_cart($id){
 		$result = $this->User->validate_users();
@@ -169,21 +183,13 @@ class Shops extends CI_Controller{
 			$items = $this->session->userdata('all_cart');
 			require_once('application/libraries/stripe-php/init.php');
 			$output ='';
-			foreach($items as $item){
-				$output .= " |------------------| 
-				{$item['name']} |------------------| 
-				{$item['qty']} |------------------| 
-				{$item['price']} |------------------| 
-				{$item['name']}";	
-				echo '<br>';
-			}
 			\Stripe\Stripe::setApiKey($this->config->item('stripe_secret'));
 			\Stripe\Charge::create([
 					"amount" => $this->session->userdata('total_price')*100,
 					"currency" => "php",
 					"source" => $this->input->post('stripeToken'),
 					'receipt_email' => $this->session->userdata('email'),
-					"description" => '|------------------|Item Name |------------------| Quantity |------------------| Per Price |------------------| Item Total Price |------------------| '.$output
+					"description" => 'Success'
 			]);
 			$this->Shop->guest_process($this->input->post());
 			$this->session->set_userdata('success_page',TRUE);

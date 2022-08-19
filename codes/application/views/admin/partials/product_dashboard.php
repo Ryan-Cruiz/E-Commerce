@@ -27,12 +27,12 @@
                 <tbody>
 <?php $num=0;foreach($data as $d){?>
 <?php if($num%2 == 0){?>
-                    <tr class="color0 product_id_<?=$d['id']?>">
+                    <tr class="color0 product_id_<?=$d['p_id']?>">
 <?php }else{?>
-                    <tr class="color1 product_id_<?=$d['id']?>">
+                    <tr class="color1 product_id_<?=$d['p_id']?>">
 <?php } $num++;?>
                         <td><img src="<?=$d['url']?>" alt="<?=$d['item_name']?>"></td>
-                        <td class="product_id"><?=$d['id']?></td>
+                        <td class="product_id"><?=$d['p_id']?></td>
                         <td><?=$d['item_name']?></td>
                         <td><?=$d['stock']?></td>
                         <td><?=$d['total_sold']?></td>

@@ -25,13 +25,14 @@ class Admins extends CI_Controller{
     }
     /* ORDER PAGE DASHBOARD VIEW */
     public function order_page(){
-        $this->page_redirection(array('title'=>'Order Dashboard'),'order_dashboard');
+        $history =  $this->Admin->get_history();
+        $this->page_redirection(array('title'=>'Order Dashboard','history' => $history),'order_dashboard');
     }
     /* PRODUCT DASHBOARD VIEW */
     public function product_dashboard($page){
         $data = $this->Admin->get_all_products($page);
         $category = $this->Admin->get_all_category();
-        $page = $this->Shop->the_page();
+        $page = $this->Shop->the_page('products',array());
         $this->page_redirection(array('title'=>'Product Dashboard',
         'data' => $data,'category'=> $category,'pages' => $page,'action' => '/products'),'product_dashboard');
     }
@@ -68,33 +69,16 @@ class Admins extends CI_Controller{
             }
         }
     }
+    /* DELETE A PRODUCT ITEM */
     public function delete_item($id){
         $this->Admin->delete_product($id);
         $this->Admin->get_all_category();
     }
+
     /* VALIDATE CATEGORY IF EXIST AND ADD ITEM  */
     public function add_item(){
         $this->output->enable_profiler(true);
-        if(!$this->input->post('product_add_category')){ // not a create new category
-            $result = $this->Admin->category_validate($this->input->post('curr_category'));
-            if($result['counts'] == 0){
-                // error
-                redirect('products/1');
-            }else{
-                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$result['id']);
-                redirect('products/1');
-            }
-        }else{ // create a new category
-            $result = $this->Admin->category_validate($this->input->post('product_add_category'));
-            if($result['counts'] == 0){
-                $category_id = $this->Admin->add_category($this->input->post('product_add_category'));
-                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$category_id);
-                redirect('products/1');
-            }else{
-                // error
-                redirect('products/1');
-            }
-        }
+       $this->Admin->is_category_exist($this->input->post(),$this->input->post('curr_category'));
     }
 
     /*------------------CATEGORIES--------------------- */
@@ -114,5 +98,21 @@ class Admins extends CI_Controller{
     /* DELETE CATEGORY */
     public function delete_category($id){
         $this->Admin->delete_category($id);
+    }
+    /* --------------ORDER HISTORY-------------------- */
+
+    public function update_status($id){ // table,status,page
+        $this->output->enable_profiler(true);
+       $this->Admin->get_status($this->input->post('admin_orders_update'),$id);
+       //redirect('admin');
+    }
+    public function search_status(){
+       // $this->output->enable_profiler(true);
+        if($this->input->post('admin_orders_status') == ''){
+            $view_data = $this->Admin->search_status('t.id',$this->input->post('admin_orders_search'),1);
+        }else{
+            $view_data = $this->Admin->search_status('status',$this->input->post('admin_orders_status'),1);
+        }
+        $this->page_redirection(array('title'=>'Order Dashboard','history' => $view_data),'order_dashboard');
     }
 }
