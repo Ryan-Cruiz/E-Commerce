@@ -156,6 +156,7 @@ class Admin extends CI_Model{
         INNER JOIN guests as g ON c.guest_id = g.id
         INNER JOIN addresses as a ON a.guest_id = g.id WHERE add_type = 2";
 
+    /* ALL HISTORY */
     public function get_history(){
         return $this->db->query($this->history_query)->result_array();
     }
@@ -173,6 +174,7 @@ class Admin extends CI_Model{
             }
         }
     }
+    /* UPDATE STATUS TYPE */
     public function get_status($status,$cart_id){
         return $this->db->query("UPDATE carts SET status_type = ?, updated_at = NOW() WHERE id =?"
         ,array($this->security->xss_clean($status),$this->security->xss_clean($cart_id)));

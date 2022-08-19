@@ -82,6 +82,7 @@ class Shops extends CI_Controller{
 		$view_data['product'] = $this->Admin->get_product_id($product_id);
 		$this->load->view('product/item_page',$view_data);
 	}
+	/* SUCCESS VIEW PAGE */
 	public function success_page(){
 		$result = $this->User->validate_users();
 		
@@ -133,6 +134,7 @@ class Shops extends CI_Controller{
 		}
 		$this->load->view('partials/items',$view_data);
 	}
+	/* SEARCH PRODUCTS */
 	public function search_product(){
 		$view_data['items'] = $this->Shop->get_all_items(1,1,$this->input->post('product_name'));
 		$this->load->view('partials/items',$view_data); 
@@ -152,16 +154,12 @@ class Shops extends CI_Controller{
 	public function destroy($id){
 		$result = $this->User->validate_users();
 		if($result == 'user' || $result == 'admin'){
-		
+			$this->Shop->delete_item($id);
+			redirect('/mycart');
 		}else{
 			$this->Shop->delete_item($id);
 			redirect('/mycart');
 		}
-	}
-	public function test(){
-		echo '<pre>';
-
-		echo '</pre>';
 	}
 	/* STRIPE API PAYMENT METHOD */
 	public function handlePayment(){
