@@ -154,7 +154,7 @@ class Shop extends CI_Model{
     /* ADD A CART OF USER/GUEST 
         status 1 shipping,2 complete,3 pending(user logged in), 0 cancelled*/
     public function add_to_cart($guest_id,$status){ 
-        return $this->db->insert_id($this->db->query("INSERT INTO carts(guest_id,status,total,created_at) VALUES(?,?,?,NOW())"
+        return $this->db->insert_id($this->db->query("INSERT INTO carts(guest_id,status_type,total,created_at) VALUES(?,?,?,NOW())"
         ,array($guest_id,$status,$this->security->xss_clean($this->session->userdata('total_price')))));
     }
     /* INSERT ADDRESS WITH TYPE AND THE STRING TYPE I.E '_ship' and '_bill'
