@@ -76,9 +76,25 @@ class Admins extends CI_Controller{
     }
 
     /* VALIDATE CATEGORY IF EXIST AND ADD ITEM  */
-    public function add_item(){
-        $this->output->enable_profiler(true);
-       $this->Admin->is_category_exist($this->input->post(),$this->input->post('curr_category'));
+      public function add_item(){
+       // $this->output->enable_profiler(true);
+        if(!$this->input->post('product_add_category')){ // not a create new category
+            $result = $this->Admin->category_validate($this->input->post('curr_category'));
+            if($result['counts'] == 0){
+                // error
+            }else{
+                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$result['id']);
+            }
+        }else{ // create a new category
+            $result = $this->Admin->category_validate($this->input->post('product_add_category'));
+            if($result['counts'] == 0){
+                $category_id = $this->Admin->add_category($this->input->post('product_add_category'));
+                $this->Admin->add_product($this->input->post(),$this->input->post('curr_category'),$category_id);
+            }else{
+                // error
+            }
+        }
+        redirect('products/1');
     }
 
     /*------------------CATEGORIES--------------------- */
@@ -102,7 +118,7 @@ class Admins extends CI_Controller{
     /* --------------ORDER HISTORY-------------------- */
 
     public function update_status($id){ // table,status,page
-        $this->output->enable_profiler(true);
+       // $this->output->enable_profiler(true);
        $this->Admin->get_status($this->input->post('admin_orders_update'),$id);
        //redirect('admin');
     }

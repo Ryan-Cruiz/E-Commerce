@@ -15,7 +15,7 @@ class Admin extends CI_Model{
             $page = 1;
         }
             $start = ($page-1)* $record_per_page;
-        return $this->db->query($this->query." WHERE is_main = 1 LIMIT $start,$record_per_page")->result_array();
+        return $this->db->query($this->query." WHERE is_main = 1 GROUP BY products.id LIMIT $start,$record_per_page")->result_array();
     }
 
     /* GET THE CERTAIN PRODUCT WHERE ID */
@@ -54,7 +54,7 @@ class Admin extends CI_Model{
     }
       /* SEARCH ITEM PRODUCT */
     public function search_product_item($input){
-            return $this->db->query($this->query." WHERE item_name LIKE ? OR id = ? AND is_main = 1",array($this->security->xss_clean($input.'%'),$this->security->xss_clean($input)))->result_array();
+            return $this->db->query($this->query." WHERE item_name LIKE ? OR products.id = ? AND is_main = 1",array($this->security->xss_clean($input.'%'),$this->security->xss_clean($input)))->result_array();
     }
     /* SEARCH ORDER ID */
     public function search_order($input){
@@ -62,10 +62,9 @@ class Admin extends CI_Model{
     }
     /* GET THE ITEM IMAGES 
     LOOP THE ARRAY OF IMAGES AND FETCH IT ONE BY ONE */
-    public function images($product_id,$pictures,$category_name){
-        mkdir('assets/img/products/'.$category_name);
+    public function images($product_id,$pictures){
         for($i=0; $i<count($_FILES['myFile']);$i++){
-            $target_dir = 'assets/img/products/'.$category_name.'/'; // category file name
+            $target_dir = 'assets/img/products/'; // category file name
             $target_file = $target_dir . basename($_FILES['myFile']['name'][$i]);
             $uploadOk = 1;
             $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
@@ -74,11 +73,6 @@ class Admin extends CI_Model{
             if($check !== false) {
                 $uploadOk = 1;
             }
-            // if (file_exists($target_file)) {
-            //    // echo "Sorry, file already exists.";
-            //   // $target_file = $target_dir .'dupName_'.$i.'_'. basename($_FILES['myFile']['name'][$i]);
-            //     $uploadOk = 0;
-            //     }
             // Allow certain file formats
             if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
             && $imageFileType != "gif" && $imageFileType != 'webp' && $imageFileType != 'jfif' ) {
@@ -97,6 +91,7 @@ class Admin extends CI_Model{
                 }
             }
         }
+        return;
     }
     /* ADD UPDATE VALIDATOR */
     public function add_update_validator(){
@@ -161,19 +156,6 @@ class Admin extends CI_Model{
         return $this->db->query($this->history_query)->result_array();
     }
     /* -------------------VALIDATIONS----------------------------*/
-    public function is_category_exist($inputs,$current_category){
-        $result = $this->category_validate($this->security->xss_clean($current_category));
-        if(!$current_category){ // not a create new category
-            if($result['counts'] != 0){
-                $this->add_product($inputs,$current_category,$result['id']);
-            }
-        }else{ // create a new category
-            if($result['counts'] == 0){
-                $category_id = $this->Admin->add_category($current_category);
-                $this->add_product($inputs,$current_category,$category_id);
-            }
-        }
-    }
     /* UPDATE STATUS TYPE */
     public function get_status($status,$cart_id){
         return $this->db->query("UPDATE carts SET status_type = ?, updated_at = NOW() WHERE id =?"
